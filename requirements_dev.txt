@@ -1,2 +1,3 @@
 pip>=19.3.0
 wheel>=0.33.1
+RPi.GPIO

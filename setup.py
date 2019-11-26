@@ -8,7 +8,7 @@ setup(
     description='',
     url='',
     packages=['smarta'],
-    install_requires=[],
+    install_requires=['smbus', 'RPi.GPIO'],
     scripts=[],
     classifiers=[
         "Programming Language :: Python :: 3.7",
