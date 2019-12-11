@@ -1,4 +1,5 @@
 from smarta.app_states import *
+from smarta.utility.led import LedManager
 import logging
 
 
@@ -25,6 +26,8 @@ class Smarta(object):
 
 
 def main():
+    #led = LedManager.get_instance()
+    #led.red_blinking(5)
     Smarta()
 
 
