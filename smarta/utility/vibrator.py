@@ -1,5 +1,4 @@
-from gpio import InputDevice, OutputDevice, PWMOutputDevice
-from time import sleep, time
+from gpiozero import InputDevice, OutputDevice, PWMOutputDevice
 
 trig = OutputDevice(4)
 echo = InputDevice(17)

@@ -1,10 +1,13 @@
 from smarta.app_states import *
-<<<<<<< Updated upstream
+
 from smarta.utility.led import LedManager
-=======
+from smarta.utility.vibrator import vibratorManager
+
 from smarta.utility.led import *
->>>>>>> Stashed changes
+
 import logging
+
+from smarta.utility.vibrator import vibratorManager
 
 
 class Smarta(object):
@@ -30,12 +33,11 @@ class Smarta(object):
 
 
 def main():
-<<<<<<< Updated upstream
+
     #led = LedManager.get_instance()
     #led.red_blinking(5)
-=======
-    LedManager.get_instance().elenafunc()
->>>>>>> Stashed changes
+    x = vibratorManager.get_instance()
+
     Smarta()
 
 
