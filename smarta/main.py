@@ -33,13 +33,8 @@ class Smarta(object):
 
 
 def main():
-<<<<<<< HEAD
-    # led = LedManager.get_instance()
-    # led.red_blinking(5)
-    vib = VibratorManager.get_instance()
-=======
 
-    # led = LedManager.get_instance()
+    # vib = VibratorManager.get_instance()
 
     # red = led.RedLightThread(led)
     # red.start()
@@ -55,14 +50,9 @@ def main():
     # green = led.GreenLightThread(led, 5)
     # green.start()
 
-
-    #led = LedManager.get_instance()
-    #led.red_blinking(5)
-    x = vibratorManager.get_instance()
->>>>>>> master
-
     Smarta()
 
 
 if __name__ == '__main__':
+
     main()

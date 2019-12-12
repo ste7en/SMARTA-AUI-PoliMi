@@ -20,10 +20,6 @@ class LedManager():
     __LED_CHANNEL = 0
     __LED_STRIP = ws.WS2812_STRIP
 
-    #__LED_STRIP = ws.SK6812W_STRIP
-
-    # LED_STRIP = ws.SK6812W_STRIP
-
     __instance = None
 
     def __init__(self):
@@ -131,7 +127,7 @@ class LedManager():
 
     def __elenafunc(self):
         """
-        Function to try leds
+        Function to test LEDs
         """
         while True:
             self.__colorWipe(self.strip, Color(255, 0, 0), 0)  # Red wipe
