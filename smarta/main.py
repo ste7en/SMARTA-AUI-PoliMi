@@ -39,7 +39,7 @@ def main():
     # yellow.start()
     # time.sleep(10)
     # time.sleep(1)
-    
+
     # green = led.GreenLightThread(led, 5)
     # green.start()
 
