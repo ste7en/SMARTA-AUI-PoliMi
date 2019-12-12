@@ -74,4 +74,4 @@ class LaunchDetector(threading.Thread):
         Computes the average value of the VSA queue
         :return: average of the values stored in __vsa_array
         """
-        return mean(self.__vsa_array)
+        return None if self.__stopped else mean(self.__vsa_array)
