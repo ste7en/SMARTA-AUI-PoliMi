@@ -13,7 +13,7 @@ class State(object):
         self.machine = machine
         print('Processing state:', str(self.__class__.__name__))
 
-    def on_event(self, event) -> State:
+    def on_event(self, event):
         """
         Called by the machine which runs the state to get a specific transition
         :param event: an event that could happen during state's execution
@@ -21,6 +21,7 @@ class State(object):
         :rtype: State
         """
         pass
+
     def __execute(self) -> None:
         """
         Code to be executed by the state when it's ran by the machine
