@@ -1,9 +1,14 @@
 from smarta.utility.GPIOManager import GPIOManager
 import time
 from rpi_ws281x import Color, PixelStrip, ws
+from threading import Thread
 from threading import Timer
 
 class LedManager():
+
+    # LED blinking times configuration:
+    __BLINKING_TIME_RED = 0.5
+    __BLINKING_TIME_YELLOW = 1   # yellow light blinks more slowly
 
     # LED strip configuration:
     __LED_COUNT = 3  # Number of LED pixels.
@@ -37,51 +42,119 @@ class LedManager():
             LedManager()
         return LedManager.__instance
 
+    class RedLightThread(Thread):
+        """
+        Thread that will make the leds start blinking red light.
+        To stop, set "running" parameter of thread to False.
+        """
+        def __init__(self, led):
+            """
 
+            :param led:
+            :type led: LedManager
+            """
+            super().__init__()
+            self.led = led
+            self.running = True
+
+        def run(self):
+            while (self.running):
+                self.led.red_blinking()
+            self.led.turn_off()
+
+    class YellowLightThread(Thread):
+        """
+        Thread that will make the leds start blinking yellow light (slowly), for a determined amount of time.
+        Specify amount of time as parameter "time_s" when creating thread.
+        To stop, set "running" parameter of thread to False.
+        """
+        def __init__(self, led, time_s):
+            """
+
+            :param led:
+            :type led: LedManager
+
+            :param time_s: length of time (in seconds) the yellow light must blink
+            """
+            super().__init__()
+            self.led = led
+            self.running = True
+            self.time_s = time_s
+
+        def __timeout_expired(self):
+            self.running = False
+
+        def run(self):
+
+            timer = Timer(self.time_s, self.__timeout_expired)
+            timer.start()
+            while self.running:
+                self.led.yellow_blinking_slowly()
+            self.led.turn_off()
+
+    class GreenLightThread(Thread):
+        """
+        Thread that will make the leds start showing green light (steady, not blinking), for a determined amount of time.
+        Specify amount of time as parameter "time_s" when creating thread.
+        """
+
+        def __init__(self, led, time_s):
+            """
+
+            :param led:
+            :type led: LedManager
+
+            :param time_s: length of time (in seconds) the green light must be shown
+            """
+            super().__init__()
+            self.led = led
+            self.time_s = time_s
+
+        def run(self):
+
+            self.led.green_steady()
+            time.sleep(self.time_s)
+            self.led.turn_off()
 
     # Define functions which animate LEDs in various ways.
 
-    def colorWipe(self, strip, color, wait_ms=50):
+    def __colorWipe(self, strip, color, wait_ms=50):
 
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, color)
             strip.show()
             time.sleep(wait_ms / 1000.0)
 
-    def elenafunc(self):
-
+    def __elenafunc(self):
+        """
+        Function to try leds
+        """
         while True:
-
-            self.colorWipe(self.strip, Color(255, 0, 0), 0)  # Red wipe
+            self.__colorWipe(self.strip, Color(255, 0, 0), 0)  # Red wipe
             time.sleep(1)
-            self.colorWipe(self.strip, Color(0, 255, 0), 0)  # Green wipe
+            self.__colorWipe(self.strip, Color(0, 255, 0), 0)  # Green wipe
             time.sleep(1)
-            self.colorWipe(self.strip, Color(0, 0, 255), 0)  # Blue wipe
+            self.__colorWipe(self.strip, Color(0, 0, 255), 0)  # Blue wipe
             time.sleep(1)
-            self.colorWipe(self.strip, Color(255, 255, 255), 0)  # Composite White wipe
+            self.__colorWipe(self.strip, Color(255, 255, 255), 0)  # Composite White wipe
             time.sleep(1)
-            self.colorWipe(self.strip, Color(255, 255, 255, 255), 0)  # Composite White + White LED wipe
-            time.sleep(1)
-
-    # possibilmente implementare una versione più carina con un timer, invece di un for
-    def red_blinking(self, wait_s):
-        for i in range(wait_s):
-            self.colorWipe(self.strip, Color(255, 0, 0), 0)  # Red wipe
-            time.sleep(0.5)
-            self.colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
-            time.sleep(0.5)
-
-    def stop(self):
-        self.colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
-
-    def yellow_blinking_slowly(self, wait_s):
-        for i in range(wait_s):
-            self.colorWipe(self.strip, Color(255, 200, 0), 0)  # Yellow wipe
-            time.sleep(1)
-            self.colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
+            self.__colorWipe(self.strip, Color(255, 255, 255, 255), 0)  # Composite White + White LED wipe
             time.sleep(1)
 
-    def green_new_turn(self):
-        self.colorWipe(self.strip, Color(0, 255, 0), 0)  # Green wipe
-        time.sleep(3)
-        self.colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
+    def red_blinking(self):
+        self.__colorWipe(self.strip, Color(255, 0, 0), 0)  # Red wipe
+        time.sleep(self.__BLINKING_TIME_RED)
+        self.__colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
+        time.sleep(self.__BLINKING_TIME_RED)
+
+    def turn_off(self):
+        self.__colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
+
+    def yellow_blinking_slowly(self):
+        self.__colorWipe(self.strip, Color(255, 200, 0), 0)  # Yellow wipe
+        time.sleep(self.__BLINKING_TIME_YELLOW)
+        self.__colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
+        time.sleep(self.__BLINKING_TIME_YELLOW)
+
+    def green_steady(self):
+        self.__colorWipe(self.strip, Color(0, 255, 0), 0)  # Green wipe
