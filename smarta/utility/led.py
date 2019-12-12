@@ -19,7 +19,11 @@ class LedManager():
     __LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
     __LED_CHANNEL = 0
     __LED_STRIP = ws.WS2812_STRIP
+<<<<<<< Updated upstream
     #__LED_STRIP = ws.SK6812W_STRIP
+=======
+    # LED_STRIP = ws.SK6812W_STRIP
+>>>>>>> Stashed changes
     __instance = None
 
     def __init__(self):

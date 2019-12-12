@@ -1,7 +1,14 @@
 from smarta.app_states import *
 from smarta.utility.led import LedManager
+from smarta.utility.vibrator import vibratorManager
+
+from smarta.utility.led import *
+
 import logging
 import time
+
+from smarta.utility.vibrator import vibratorManager
+
 
 class Smarta(object):
     """
@@ -42,6 +49,11 @@ def main():
 
     # green = led.GreenLightThread(led, 5)
     # green.start()
+
+
+    #led = LedManager.get_instance()
+    #led.red_blinking(5)
+    x = vibratorManager.get_instance()
 
     Smarta()
 

@@ -1,33 +1,23 @@
 from math import sqrt
+from statistics import mean
 from smarta.utility.accellerometer_manager import AccelerometerManager as Accelerometer
 import sched
+import threading
 import time
 
 
-class LaunchDetector:
-    __instance = None
-    __queue_length = 5
+class LaunchDetector(threading.Thread):
+    __queue_length = 15
     __acquisition_period_in_seconds = 0.1
 
     def __init__(self):
-        if LaunchDetector.__instance is None:
-            LaunchDetector.__instance = self
-            self.__vsa_array = [0.0, 0.0, 0.0, 0.0, 0.0]
-            self.__sched = sched.scheduler(time.time, time.sleep)
-            self.__accelerometer = Accelerometer.get_instance()
-        else:
-            raise Exception("This class is a Singleton")
+        super().__init__()
+        self.__vsa_array = []
+        self.__sched = sched.scheduler(time.time, time.sleep)
+        self.__accelerometer = Accelerometer.get_instance()
+        self.__stopped = False
 
-    @staticmethod
-    def get_instance():
-        """ Static access method. 
-        :rtype: LaunchDetector
-        """
-        if LaunchDetector.__instance is None:
-            LaunchDetector()
-        return LaunchDetector.__instance
-
-    def _compute_vsa(self, x, y, z):
+    def _compute_and_store_vsa(self, x, y, z) -> None:
         """
         Computes the vector sum of acceleration data and puts it into a __queue_length queue
         :param x: x-acceleration
@@ -44,17 +34,44 @@ class LaunchDetector:
         print('vsa_array = ', self.__vsa_array)
         # END TEST
 
-    def start(self):
+    def start_detection(self) -> None:
         # TODO: - Log this operation
-        self.__sched.enter(self.__acquisition_period_in_seconds, 1, self._sched_acquire_and_store_data)
+        self._enter_scheduler()
         self.__sched.run()
 
-    def stop(self):
-        self.__vsa_array = [0.0, 0.0, 0.0, 0.0, 0.0]
+    def run(self):
+        self.start_detection()
 
-    def _sched_acquire_and_store_data(self):
-        x = self.__accelerometer.get_accel_x() #get_gyro_x()
-        y = self.__accelerometer.get_accel_y() #get_gyro_y()
-        z = self.__accelerometer.get_accel_z() #get_gyro_z()
-        self._compute_vsa(x, y, z)
+    def stop(self) -> None:
+        """
+        Stops the data acquisition and, consequently, the Thread
+        :return: None
+        """
+        self.__stopped = True
+        self.__vsa_array = []
+
+    def _sched_acquire_and_store_data(self) -> None:
+        """
+        Acquire accelerometer data, computes the VSA and stores it in the queue
+        :return: None
+        """
+        x = self.__accelerometer.get_accel_x()  # get_gyro_x()
+        y = self.__accelerometer.get_accel_y()  # get_gyro_y()
+        z = self.__accelerometer.get_accel_z()  # get_gyro_z()
+        self._compute_and_store_vsa(x, y, z)
+        if not self.__stopped:
+            self._enter_scheduler()
+
+    def _enter_scheduler(self) -> None:
+        """
+        Schedules the acquisition process after the specified '__acquisition_period_in_seconds' seconds
+        :return: None
+        """
         self.__sched.enter(self.__acquisition_period_in_seconds, 1, self._sched_acquire_and_store_data)
+
+    def avg_acc_value(self) -> float:
+        """
+        Computes the average value of the VSA queue
+        :return: average of the values stored in __vsa_array
+        """
+        return mean(self.__vsa_array)
