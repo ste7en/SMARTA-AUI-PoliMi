@@ -4,9 +4,12 @@ from threading import Timer
 
 
 class TimerCheckState(State):
+
+    __timer_duration_sec = 10.0
+
     def __init__(self, machine):
         super().__init__(machine)
-        self.timer = Timer(2.0, self.__timeout_expired)
+        self.timer = Timer(self.__timer_duration_sec, self.__timeout_expired)
         self.timer.start()
 
     def __timeout_expired(self):
