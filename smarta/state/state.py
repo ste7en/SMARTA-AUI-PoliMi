@@ -1,3 +1,6 @@
+from smarta.main import Smarta
+
+
 class State(object):
     """
     A state class that will be useful to define some
@@ -5,7 +8,7 @@ class State(object):
     It has to be subclassed to implement specific functionalities
     for each state.
     """
-    def __init__(self, machine):
+    def __init__(self, machine: Smarta):
         """
         State object initializer, called by subclasses
         :param machine: the FSM responsible of handling events and transitions
