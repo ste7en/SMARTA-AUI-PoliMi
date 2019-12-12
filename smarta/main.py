@@ -1,13 +1,13 @@
 from smarta.app_states import *
 
 from smarta.utility.led import LedManager
-from smarta.utility.vibrator import vibratorManager
+from smarta.utility.vibrator import VibratorManager
 
 from smarta.utility.led import *
 
 import logging
 
-from smarta.utility.vibrator import vibratorManager
+from smarta.utility.vibrator import VibratorManager
 
 
 class Smarta(object):
@@ -33,13 +33,11 @@ class Smarta(object):
 
 
 def main():
-
-    #led = LedManager.get_instance()
-    #led.red_blinking(5)
-    x = vibratorManager.get_instance()
+    # led = LedManager.get_instance()
+    # led.red_blinking(5)
+    vib = VibratorManager.get_instance()
 
     Smarta()
-
 
 
 if __name__ == '__main__':
