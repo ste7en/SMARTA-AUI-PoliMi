@@ -14,5 +14,5 @@ class TimerCheckState(State):
         self.machine.on_event(Event.TIMER_EXP_EV)
 
     def __del__(self):
-        print("destructor")
         self.timer.cancel()
+        print("timer destructor")

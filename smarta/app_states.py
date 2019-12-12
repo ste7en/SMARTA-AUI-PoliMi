@@ -1,4 +1,5 @@
 from smarta.state.state import State
+from smarta.events.launch import LaunchCheckState
 from smarta.events.events import Event
 from smarta.events.timer import TimerCheckState
 
@@ -27,7 +28,6 @@ class ResetState(State):
 
     def __execute(self):
         # Test
-        self.on_event()
 
         # LED blink
         pass
@@ -42,6 +42,9 @@ class RunState(State):
         super().__init__(machine)
         self.__execute()
 
+    def __del__(self):
+        print("Delete RunState")
+
     def on_event(self, event):
         if event == Event.TIMER_EXP_EV:
             return ResetState(self.machine)
@@ -54,16 +57,8 @@ class RunState(State):
         # Threads to check gyro/mic/timer
         print("Executing RunState")
         TimerCheckState(self.machine)
-
-
-class GyroCheckState(State):
-    pass
+        LaunchCheckState(self.machine)
 
 
 class MicCheckState(State):
     pass
-
-
-
-
-
