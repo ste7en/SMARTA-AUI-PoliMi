@@ -4,6 +4,7 @@ from rpi_ws281x import Color, PixelStrip, ws
 from threading import Thread
 from threading import Timer
 
+
 class LedManager():
 
     # LED blinking times configuration:
@@ -42,79 +43,6 @@ class LedManager():
             LedManager()
         return LedManager.__instance
 
-    class RedLightThread(Thread):
-        """
-        Thread that will make the leds start blinking red light.
-        To stop, set "running" parameter of thread to False.
-        """
-        def __init__(self, led):
-            """
-
-            :param led:
-            :type led: LedManager
-            """
-            super().__init__()
-            self.led = led
-            self.running = True
-
-        def run(self):
-            while (self.running):
-                self.led.red_blinking()
-            self.led.turn_off()
-
-    class YellowLightThread(Thread):
-        """
-        Thread that will make the leds start blinking yellow light (slowly), for a determined amount of time.
-        Specify amount of time as parameter "time_s" when creating thread.
-        To stop, set "running" parameter of thread to False.
-        """
-        def __init__(self, led, time_s):
-            """
-
-            :param led:
-            :type led: LedManager
-
-            :param time_s: length of time (in seconds) the yellow light must blink
-            """
-            super().__init__()
-            self.led = led
-            self.running = True
-            self.time_s = time_s
-
-        def __timeout_expired(self):
-            self.running = False
-
-        def run(self):
-
-            timer = Timer(self.time_s, self.__timeout_expired)
-            timer.start()
-            while self.running:
-                self.led.yellow_blinking_slowly()
-            self.led.turn_off()
-
-    class GreenLightThread(Thread):
-        """
-        Thread that will make the leds start showing green light (steady, not blinking), for a determined amount of time.
-        Specify amount of time as parameter "time_s" when creating thread.
-        """
-
-        def __init__(self, led, time_s):
-            """
-
-            :param led:
-            :type led: LedManager
-
-            :param time_s: length of time (in seconds) the green light must be shown
-            """
-            super().__init__()
-            self.led = led
-            self.time_s = time_s
-
-        def run(self):
-
-            self.led.green_steady()
-            time.sleep(self.time_s)
-            self.led.turn_off()
 
     # Define functions which animate LEDs in various ways.
 
@@ -158,3 +86,69 @@ class LedManager():
 
     def green_steady(self):
         self.__colorWipe(self.strip, Color(0, 255, 0), 0)  # Green wipe
+
+
+class RedLightThread(Thread):
+    """
+    Thread that will make the leds start blinking red light.
+    To stop, set "running" parameter of thread to False.
+    """
+    def __init__(self):
+        """
+        """
+        super().__init__()
+        self.led = LedManager.get_instance()
+        self.running = True
+
+    def run(self):
+        while self.running:
+            self.led.red_blinking()
+        self.led.turn_off()
+
+
+class YellowLightThread(Thread):
+    """
+    Thread that will make the leds start blinking yellow light (slowly), for a determined amount of time.
+    Specify amount of time as parameter "time_s" when creating thread.
+    To stop, set "running" parameter of thread to False.
+    """
+    def __init__(self, time_s):
+        """
+        :param time_s: length of time (in seconds) the yellow light must blink
+        """
+        super().__init__()
+        self.led = LedManager.get_instance()
+        self.running = True
+        self.time_s = time_s
+
+    def __timeout_expired(self):
+        self.running = False
+
+    def run(self):
+
+        timer = Timer(self.time_s, self.__timeout_expired)
+        timer.start()
+        while self.running:
+            self.led.yellow_blinking_slowly()
+        self.led.turn_off()
+
+
+class GreenLightThread(Thread):
+    """
+    Thread that will make the leds start showing green light (steady, not blinking), for a determined amount of time.
+    Specify amount of time as parameter "time_s" when creating thread.
+    """
+
+    def __init__(self, time_s):
+        """
+        :param time_s: length of time (in seconds) the green light must be shown
+        """
+        super().__init__()
+        self.led = LedManager.get_instance()
+        self.time_s = time_s
+
+    def run(self):
+
+        self.led.green_steady()
+        time.sleep(self.time_s)
+        self.led.turn_off()
