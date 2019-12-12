@@ -1,6 +1,5 @@
 import smbus
 import time
-import RPi.GPIO as gpio
 
 from abc import ABC, abstractmethod
 
