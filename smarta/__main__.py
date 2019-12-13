@@ -11,6 +11,7 @@ class Smarta(object):
     """
     def __init__(self):
         self.state = IdleState(self)
+        self.state.execute()
         time.sleep(3)
         self.on_event(Event.START_EV)
 
