@@ -1,4 +1,4 @@
-from smarta.main import Smarta
+from smarta.__main__ import Smarta
 
 
 class State(object):

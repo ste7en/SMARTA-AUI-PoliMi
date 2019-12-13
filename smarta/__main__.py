@@ -1,12 +1,8 @@
-from smarta.utility.launch_detector import LaunchDetector
-from smarta.utility.led import LedManager
-from smarta.utility.vibrator import VibratorManager
-from smarta.utility.led import *
 from smarta.app_states import *
-
+from smarta.events.events import Event
 import logging
 import time
-
+import threading
 
 
 class Smarta(object):
@@ -15,6 +11,7 @@ class Smarta(object):
     """
     def __init__(self):
         self.state = IdleState(self)
+        time.sleep(3)
         self.on_event(Event.START_EV)
 
     def on_event(self, event=None) -> None:
@@ -29,28 +26,12 @@ class Smarta(object):
             logging.info(event)
         # Every state is responsible for its transition table
         self.state = self.state.on_event(event)
+        threading.Thread(target=self.state.execute).start()
 
 
 def main():
-
-    # led = LedManager().get_instance()
-    # red = led.RedLightThread(led)
-    # red.start()
-    # time.sleep(5)
-    # red.running = False
-
-    # time.sleep(1)
-    # yellow = led.YellowLightThread(led, 10)
-    # yellow.start()
-    # time.sleep(10)
-    # time.sleep(1)
-
-    # green = led.GreenLightThread(led, 5)
-    # green.start()
-
     Smarta()
 
 
 if __name__ == '__main__':
-
     main()
