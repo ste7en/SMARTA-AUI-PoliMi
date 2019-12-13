@@ -1,7 +1,7 @@
 from smarta.state.state import State
 from smarta.events.events import Event
-from threading import Timer
 from smarta.utility.led import *
+from threading import Timer
 
 
 class TimerCheckState(State):
