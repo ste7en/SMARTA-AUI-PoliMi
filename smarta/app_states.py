@@ -15,6 +15,9 @@ class IdleState(State):
             return RunState(self.machine)
         return self
 
+    def execute(self):
+        LedManager.get_instance().turn_off()  # Turn off LEDs, if they are on
+
 
 class ResetState(State):
     """
