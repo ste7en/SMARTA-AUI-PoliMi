@@ -25,7 +25,7 @@ class State(object):
         """
         pass
 
-    def __execute(self) -> None:
+    def execute(self) -> None:
         """
         Code to be executed by the state when it's ran by the machine
         :return: None

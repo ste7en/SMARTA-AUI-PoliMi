@@ -22,14 +22,10 @@ class ResetState(State):
     """
     __GREEN_LIGHT_TIME = 3  # Duration of time that time green light will be shown, at the start of a new turn
 
-    def __init__(self, machine):
-        super().__init__(machine)
-        self.__execute()
-
     def on_event(self, event=None):
         return RunState(self.machine)
 
-    def __execute(self):
+    def execute(self):
         # Test
 
         # LED green light blinks
@@ -47,9 +43,8 @@ class RunState(State):
     __TURN_DURATION_TIME = 15  # Duration of a turn
     __YELLOW_LIGHT_TIME = 5  # Duration of time that yellow light will blink, before the end of the turn
 
-    def __init__(self, machine):
-        super().__init__(machine)
-        self.__execute()
+    __launch_check_state = None
+    __timer_check_state = None
 
     def __del__(self):
         print("Delete RunState")
@@ -62,11 +57,11 @@ class RunState(State):
         if event == Event.VOICE_OVERLAP_DET_EV:
             pass
 
-    def __execute(self):
+    def execute(self):
         # Threads to check gyro/mic/timer
         print("Executing RunState")
-        TimerCheckState(self.machine, self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
-        LaunchCheckState(self.machine)
+        self.__timer_check_state = TimerCheckState(self.machine, self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
+        self.__launch_check_state = LaunchCheckState(self.machine)
 
 
 class MicCheckState(State):
