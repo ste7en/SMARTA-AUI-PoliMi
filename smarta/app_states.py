@@ -48,14 +48,11 @@ class RunState(State):
 
     def __del__(self):
         print("Delete RunState")
+        self.__timer_check_state.__del__()
+        self.__launch_check_state.__del__()
 
-    def on_event(self, event):
-        if event == Event.TIMER_EXP_EV:
-            return ResetState(self.machine)
-        if event == Event.LAUNCH_DET_EV:
-            return ResetState(self.machine)
-        if event == Event.VOICE_OVERLAP_DET_EV:
-            pass
+    def on_event(self, event) -> State:
+        return ResetState(self.machine) if event is Event.TIMER_EXP_EV or Event.LAUNCH_DET_EV else None
 
     def execute(self):
         # Threads to check gyro/mic/timer
