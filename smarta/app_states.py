@@ -31,6 +31,7 @@ class ResetState(State):
         # LED green light blinks
         green = GreenLightThread(self.__GREEN_LIGHT_TIME)
         green.start()
+        time.sleep(0.5)
         self.machine.on_event(Event.RESET_EV)
 
 

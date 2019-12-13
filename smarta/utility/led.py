@@ -119,12 +119,34 @@ class YellowLightThread(Thread):
         self.running = False
 
     def run(self):
-
         timer = Timer(self.time_s, self.__timeout_expired)
         timer.start()
         while self.running:
             self.led.yellow_blinking_slowly()
         self.led.turn_off()
+
+
+class YellowLightTimer:
+    def __init__(self, time_s: float):
+        self.led = LedManager.get_instance()
+        self.__timer = Timer(self.__time_s, self.__timeout_expired)
+        self.__time_s = time_s
+        self.__running = True
+        self.__start_timer()
+
+    def __timeout_expired(self):
+        self.__running = False
+
+    def __start_timer(self):
+        self.__timer.start()
+
+    def __run(self):
+        while self.__running:
+            self.led.yellow_blinking_slowly()
+        self.led.turn_off()
+
+    def __cancel(self):
+        self.__timer.cancel()
 
 
 class GreenLightThread(Thread):

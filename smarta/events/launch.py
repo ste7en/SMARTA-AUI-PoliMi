@@ -6,7 +6,7 @@ import threading
 
 
 class LaunchCheckState(State):
-    __threshold_value_phase_one = 0.45
+    __threshold_value_phase_one = 0.3
     __threshold_value_phase_two = 0.1
 
     def __init__(self, machine):
@@ -31,6 +31,8 @@ class LaunchCheckState(State):
         self.__last_vsa_value = self.__launchDetector.avg_acc_value()
         while self.__last_vsa_value is not None:
             vsa_value = self.__launchDetector.avg_acc_value()
+            if vsa_value is None:
+                return
             delta = fabs(vsa_value - self.__last_vsa_value)
             # print('delta =', delta)
             if delta > self.__threshold_value_phase_one and self.__launch_phase_started is False:
@@ -40,3 +42,4 @@ class LaunchCheckState(State):
                 print("Lancio finito, delta = ", delta)
                 self.__launch_phase_started = False
                 self.machine.on_event(Event.LAUNCH_DET_EV)
+            self.__last_vsa_value = vsa_value
