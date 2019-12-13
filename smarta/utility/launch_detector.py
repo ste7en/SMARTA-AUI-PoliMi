@@ -1,13 +1,14 @@
+from smarta.utility.accellerometer_manager import AccelerometerManager as Accelerometer
 from math import sqrt
 from statistics import mean
-from smarta.utility.accellerometer_manager import AccelerometerManager as Accelerometer
 import sched
 import threading
 import time
+import copy
 
 
 class LaunchDetector(threading.Thread):
-    __queue_length = 15
+    __queue_length = 5
     __acquisition_period_in_seconds = 0.1
 
     def __init__(self):
@@ -24,14 +25,14 @@ class LaunchDetector(threading.Thread):
         :param y: y-acceleration
         :param z: z-acceleration
         """
-        vsa = round(sqrt((x ** 2) + (y ** 2) + (z ** 2)), 5)
+        vsa = round(sqrt((x ** 2) + (y ** 2) + (z ** 2)), 4)
 
         if len(self.__vsa_array) == LaunchDetector.__queue_length:
             self.__vsa_array.pop()
         self.__vsa_array.insert(0, vsa)
 
         # TEST TODO: - Remove this print
-        print('vsa_array = ', self.__vsa_array)
+        # print('vsa_array = ', self.__vsa_array)
         # END TEST
 
     def start_detection(self) -> None:
@@ -60,6 +61,7 @@ class LaunchDetector(threading.Thread):
         z = self.__accelerometer.get_accel_z()  # get_gyro_z()
         self._compute_and_store_vsa(x, y, z)
         if not self.__stopped:
+            time.sleep(0.05)
             self._enter_scheduler()
 
     def _enter_scheduler(self) -> None:
@@ -74,4 +76,4 @@ class LaunchDetector(threading.Thread):
         Computes the average value of the VSA queue
         :return: average of the values stored in __vsa_array
         """
-        return None if self.__stopped else mean(self.__vsa_array)
+        return None if self.__stopped else 1 if len(self.__vsa_array) is 0 else mean(copy.copy(self.__vsa_array))
