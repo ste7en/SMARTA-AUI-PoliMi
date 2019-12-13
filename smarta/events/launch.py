@@ -6,12 +6,14 @@ import threading
 
 
 class LaunchCheckState(State):
-    __threshold_value = 2
+    __threshold_value_phase_one = 0.45
+    __threshold_value_phase_two = 0.1
 
     def __init__(self, machine):
         super().__init__(machine)
         self.__launchDetector = LaunchDetector()
         self.__last_vsa_value = None
+        self.__launch_phase_started = False
         self.__execute()
 
     def __del__(self):
@@ -20,7 +22,7 @@ class LaunchCheckState(State):
 
     def __execute(self):
         self.__launchDetector.start()
-        threading.Thread(target=self.__check)
+        threading.Thread(target=self.__check).start()
 
     def __check(self):
         """
