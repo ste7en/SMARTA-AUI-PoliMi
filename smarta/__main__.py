@@ -1,38 +1,49 @@
-from smarta.app_states import *
-from smarta.events.events import Event
+from flask import Flask, request
+from smarta.smarta_fsm import Smarta
 import logging
-import time
-import threading
 
 
-class Smarta(object):
-    """
-    The FSM that will handle the different states of the game.
-    """
-    def __init__(self):
-        self.state = IdleState(self)
-        self.state.execute()
-        time.sleep(3)
-        self.on_event(Event.START_EV)
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s [Thread %(threadName)s)] : %(message)s')
+app = Flask(__name__)
+application_instance = Smarta()
 
-    def on_event(self, event=None) -> None:
-        """
-        This function calls the State.on_event() func to realize
-        a transition function for every captured event
-        :param event: an acceptable event, as described into events.py
-        """
-        if event is not None:
-            # TODO: Log
-            print("Event: ", event)
-            logging.info(event)
-        # Every state is responsible for its transition table
-        self.state = self.state.on_event(event)
-        threading.Thread(target=self.state.execute).start()
+logging.debug('Flask WebInterface started')
 
 
-def main():
-    Smarta()
+def start():
+    logging.info('HTTP Client started the application')
+    application_instance.start()
 
 
-if __name__ == '__main__':
-    main()
+def stop():
+    logging.info('HTTP Client stopped the application')
+    application_instance.stop()
+
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
+
+@app.route('/api/', methods=['POST', 'GET'])
+def api():
+
+    return '''
+        <form action="/api/start" method="get">
+            <p><input type=submit value=Start>         
+        </form>
+        <form action="/api/stop" method="get">
+            <p><input type=submit value=Stop>         
+        </form>
+    '''
+
+
+@app.route('/api/<command>')
+def api_command(command):
+    if command == 'start':
+        start()
+        return 'Start'
+    if command == 'stop':
+        stop()
+        return 'Stop'

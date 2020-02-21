@@ -1,20 +1,16 @@
-from smarta.__main__ import Smarta
-
-
 class State(object):
     """
     A state class that will be useful to define some
     common functions for each individual state of the FSM.
-    It has to be subclassed to implement specific functionalities
+    It has to be subclassed to implement specific actions
     for each state.
     """
-    def __init__(self, machine: Smarta):
+    def __init__(self, machine):
         """
         State object initializer, called by subclasses
-        :param machine: the FSM responsible of handling events and transitions
+        :param machine: the FSM responsible of handling events and transitions (of type Smarta)
         """
         self.machine = machine
-        print('Processing state:', str(self.__class__.__name__))
 
     def on_event(self, event):
         """
@@ -28,6 +24,13 @@ class State(object):
     def execute(self) -> None:
         """
         Code to be executed by the state when it's ran by the machine
+        :return: None
+        """
+        pass
+
+    def exit(self) -> None:
+        """
+        Code to be executed by the state when exiting
         :return: None
         """
         pass

@@ -5,7 +5,7 @@ from threading import Timer
 
 
 class LedManager(object):
-
+    # TODO: - Log and document this class
     # LED blinking times configuration:
     __BLINKING_TIME_RED = 0.5
     __BLINKING_TIME_YELLOW = 1   # yellow light blinks more slowly
@@ -42,7 +42,7 @@ class LedManager(object):
 
     # Define functions which animate LEDs in various ways.
     def __colorWipe(self, strip, color, wait_ms=50):
-        for i in range(strip.numPixels()):
+        for i in range(0, strip.numPixels()):
             strip.setPixelColor(i, color)
             strip.show()
             time.sleep(wait_ms / 1000.0)

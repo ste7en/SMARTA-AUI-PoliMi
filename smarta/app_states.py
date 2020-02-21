@@ -3,6 +3,7 @@ from smarta.events.events import Event
 from smarta.events.timer import TimerCheckState
 from smarta.events.launch import LaunchCheckState
 from smarta.utility.led import *
+import logging
 
 
 class IdleState(State):
@@ -12,10 +13,19 @@ class IdleState(State):
     """
     def on_event(self, event):
         if event == Event.START_EV:
+            # TODO: - Manage blinking with a specific function of LedManager
+            logging.debug('Idle State - Green blinking')
+            for i in range(0, 3):
+                logging.debug('blink ' + str(i))
+                t = GreenLightThread(1)
+                t.start()
+                t.join()
+                time.sleep(0.5)
             return RunState(self.machine)
         return self
 
     def execute(self):
+        logging.debug('Idle State - Turning off LEDs')
         LedManager.get_instance().turn_off()  # Turn off LEDs, if they are on
 
 
@@ -29,13 +39,15 @@ class ResetState(State):
         return RunState(self.machine)
 
     def execute(self):
-        # Test
-
+        logging.debug('-------------------')
+        logging.debug('Reset State - Green')
         # LED green light blinks
         green = GreenLightThread(self.__GREEN_LIGHT_TIME)
         green.start()
-        time.sleep(0.5)
-        self.machine.on_event(Event.RESET_EV)
+        green.join()
+        logging.debug('Reset State - Green off')
+        logging.info('Starting...')
+        self.machine.on_event(Event.START_EV)
 
 
 class RunState(State):
@@ -50,17 +62,17 @@ class RunState(State):
     __launch_check_state = None
     __timer_check_state = None
 
-    def __del__(self):
-        print("Delete RunState")
-        self.__timer_check_state.__del__()
-        self.__launch_check_state.__del__()
+    def exit(self):
+        logging.debug('RunState - exiting')
+        self.__timer_check_state.exit()
+        self.__launch_check_state.exit()
 
     def on_event(self, event) -> State:
         return ResetState(self.machine) if event is Event.TIMER_EXP_EV or Event.LAUNCH_DET_EV else None
 
     def execute(self):
         # Threads to check gyro/mic/timer
-        print("Executing RunState")
+        logging.debug('Run State - creating timer and launch detector instance')
         self.__timer_check_state = TimerCheckState(self.machine, self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
         self.__launch_check_state = LaunchCheckState(self.machine)
 

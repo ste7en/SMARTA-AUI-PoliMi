@@ -3,6 +3,7 @@ from smarta.events.events import Event
 from smarta.utility.launch_detector import LaunchDetector
 from math import fabs
 import threading
+import logging
 
 
 class LaunchCheckState(State):
@@ -16,18 +17,21 @@ class LaunchCheckState(State):
         self.__launch_phase_started = False
         self.__execute()
 
-    def __del__(self):
+    def exit(self) -> None:
         self.__launchDetector.stop()
-        print("destructor of launchcheckstate")
+        logging.debug('LaunchCheckState - exiting')
 
     def __execute(self):
+        logging.debug('LaunchCheckState - Starting the LaunchDetector...')
         self.__launchDetector.start()
+        logging.debug('LaunchCheckState - Switching to another thread...')
         threading.Thread(target=self.__check).start()
 
     def __check(self):
         """
 
         """
+        logging.debug('LaunchCheckState - OK.')
         self.__last_vsa_value = self.__launchDetector.avg_acc_value()
         while self.__last_vsa_value is not None:
             vsa_value = self.__launchDetector.avg_acc_value()
@@ -36,10 +40,11 @@ class LaunchCheckState(State):
             delta = fabs(vsa_value - self.__last_vsa_value)
             # print('delta =', delta)
             if delta > self.__threshold_value_phase_one and self.__launch_phase_started is False:
-                print("Lancio iniziato, delta = ", delta)
+                logging.debug('Launch detected, delta = ' + str(delta))
                 self.__launch_phase_started = True
             if delta < self.__threshold_value_phase_two and self.__launch_phase_started:
-                print("Lancio finito, delta = ", delta)
+                logging.debug('End of launch detected, delta = ' + str(delta))
                 self.__launch_phase_started = False
+                logging.info('The ball has been launched. Sending a Launch event to FSM...')
                 self.machine.on_event(Event.LAUNCH_DET_EV)
             self.__last_vsa_value = vsa_value
