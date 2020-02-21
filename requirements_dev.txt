@@ -1,3 +1,4 @@
-pip>=19.3.0
+pip>=20.0.2
 wheel>=0.33.1
 RPi.GPIO
+Flask
