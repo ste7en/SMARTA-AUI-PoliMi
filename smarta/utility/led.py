@@ -2,13 +2,25 @@ import time
 from rpi_ws281x import Color, PixelStrip, ws
 from threading import Thread
 from threading import Timer
+from enum import Enum
+
+
+class LedColor(Enum):
+    RED = Color(255, 0, 0)
+    YELLOW = Color(255, 200, 0)
+    GREEN = Color(0, 255, 0)
+    BLUE = Color(0, 0, 255)
+    WHITE = Color(255, 255, 255)
+    OFF = Color(0, 0, 0, 0)
+
+
+# LED blinking times configuration:
+BLINKING_TIME_RED = 0.5
+BLINKING_TIME_YELLOW = 1   # yellow light blinks more slowly
 
 
 class LedManager(object):
     # TODO: - Log and document this class
-    # LED blinking times configuration:
-    __BLINKING_TIME_RED = 0.5
-    __BLINKING_TIME_YELLOW = 1   # yellow light blinks more slowly
 
     # LED strip configuration:
     __LED_COUNT = 3         # Number of LED pixels.
@@ -40,131 +52,50 @@ class LedManager(object):
             LedManager()
         return LedManager.__instance
 
-    # Define functions which animate LEDs in various ways.
-    def __colorWipe(self, strip, color, wait_ms=50):
-        for i in range(0, strip.numPixels()):
-            strip.setPixelColor(i, color)
-            strip.show()
+    # Define function that colors all LEDs of the given color.
+    def color_wipe(self, led_color, wait_ms=50):
+        for i in range(0, self.strip.numPixels()):
+            self.strip.setPixelColor(i, led_color.value)
+            self.strip.show()
             time.sleep(wait_ms / 1000.0)
 
-    # def __elenafunc(self):
-    #     """
-    #     Function to test LEDs
-    #     """
-    #     while True:
-    #         self.__colorWipe(self.strip, Color(255, 0, 0), 0)  # Red wipe
-    #         time.sleep(1)
-    #         self.__colorWipe(self.strip, Color(0, 255, 0), 0)  # Green wipe
-    #         time.sleep(1)
-    #         self.__colorWipe(self.strip, Color(0, 0, 255), 0)  # Blue wipe
-    #         time.sleep(1)
-    #         self.__colorWipe(self.strip, Color(255, 255, 255), 0)  # Composite White wipe
-    #         time.sleep(1)
-    #         self.__colorWipe(self.strip, Color(255, 255, 255, 255), 0)  # Composite White + White LED wipe
-    #         time.sleep(1)
 
-    def red_blinking(self):
-        self.__colorWipe(self.strip, Color(255, 0, 0), 0)  # Red wipe
-        time.sleep(self.__BLINKING_TIME_RED)
-        self.__colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
-        time.sleep(self.__BLINKING_TIME_RED)
-
-    def turn_off(self):
-        self.__colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
-
-    def yellow_blinking_slowly(self):
-        self.__colorWipe(self.strip, Color(255, 200, 0), 0)  # Yellow wipe
-        time.sleep(self.__BLINKING_TIME_YELLOW)
-        self.__colorWipe(self.strip, Color(0, 0, 0, 0), 0)  # Off
-        time.sleep(self.__BLINKING_TIME_YELLOW)
-
-    def green_steady(self):
-        self.__colorWipe(self.strip, Color(0, 255, 0), 0)  # Green wipe
-
-
-class RedLightThread(Thread):
+class LedThread(Thread):
     """
-    Thread that will make the leds start blinking red light.
-    To stop, set "running" parameter of thread to False.
+        Thread that will make the leds start showing the given color in a blinking or steady manner.
+        The light will last a given amount of seconds.
+        To stop ahead of time, you can also set "running" parameter of thread to False.
     """
-    def __init__(self):
+    def __init__(self, color, duration_s, blinking_time_s=0):
         """
+        :param color: a LedColor item, the desired color of the light
+        :param duration_s: length of time the light must last
+        :param blinking_time_s: blinking interval. If set to 0, the light will be steady.
         """
         super().__init__()
         self.led = LedManager.get_instance()
         self.running = True
-
-    def run(self):
-        while self.running:
-            self.led.red_blinking()
-        self.led.turn_off()
-
-
-class YellowLightThread(Thread):
-    """
-    Thread that will make the leds start blinking yellow light (slowly), for a determined amount of time.
-    Specify amount of time as parameter "time_s" when creating thread.
-    To stop, set "running" parameter of thread to False.
-    """
-    def __init__(self, time_s):
-        """
-        :param time_s: length of time (in seconds) the yellow light must blink
-        """
-        super().__init__()
-        self.led = LedManager.get_instance()
-        self.running = True
-        self.time_s = time_s
+        self.color = color
+        self.duration_s = duration_s
+        self.blinking_time_s = blinking_time_s
 
     def __timeout_expired(self):
         self.running = False
 
     def run(self):
-        timer = Timer(self.time_s, self.__timeout_expired)
-        timer.start()
-        while self.running:
-            self.led.yellow_blinking_slowly()
-        self.led.turn_off()
+        timer = Timer(self.duration_s, self.__timeout_expired)   # timer will stop the thread after duration_s seconds
+        timer.start()                                            # (by setting "running" = False)
 
+        if self.blinking_time_s:               # if the light is a blinking light,
+            while self.running:                    # while the thread is running, it will:
+                self.led.color_wipe(self.color)    # turn on leds for blinking_time_s seconds,
+                time.sleep(self.blinking_time_s)
+                self.led.color_wipe(LedColor.OFF)  # and turn off leds for blinking_time_s seconds
+                time.sleep(self.blinking_time_s)
 
-class YellowLightTimer:
-    def __init__(self, time_s: float):
-        self.led = LedManager.get_instance()
-        self.__timer = Timer(self.__time_s, self.__timeout_expired)
-        self.__time_s = time_s
-        self.__running = True
-        self.__start_timer()
+        else:                                  # otherwise, if the light is a steady light,
+            self.led.color_wipe(self.color)    # it will turn on the leds of the desired color
+            while self.running:                # while the thread is running.
+                pass
 
-    def __timeout_expired(self):
-        self.__running = False
-
-    def __start_timer(self):
-        self.__timer.start()
-
-    def __run(self):
-        while self.__running:
-            self.led.yellow_blinking_slowly()
-        self.led.turn_off()
-
-    def __cancel(self):
-        self.__timer.cancel()
-
-
-class GreenLightThread(Thread):
-    """
-    Thread that will make the leds start showing green light (steady, not blinking), for a determined amount of time.
-    Specify amount of time as parameter "time_s" when creating thread.
-    """
-
-    def __init__(self, time_s):
-        """
-        :param time_s: length of time (in seconds) the green light must be shown
-        """
-        super().__init__()
-        self.led = LedManager.get_instance()
-        self.time_s = time_s
-
-    def run(self):
-
-        self.led.green_steady()
-        time.sleep(self.time_s)
-        self.led.turn_off()
+        self.led.color_wipe(LedColor.OFF)     # once the thread is not running anymore, leds will be turned off.

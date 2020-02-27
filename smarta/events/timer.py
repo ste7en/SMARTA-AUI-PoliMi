@@ -20,7 +20,7 @@ class TimerCheckState(State):
         logging.debug('TimerCheckState - OK.')
 
     def __yellow_blinking_light(self):
-        yellow = YellowLightThread(self.light_duration)
+        yellow = LedThread(LedColor.YELLOW, self.light_duration, BLINKING_TIME_YELLOW)
         yellow.start()
 
     def __timeout_expired(self):
