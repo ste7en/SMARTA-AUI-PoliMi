@@ -4,6 +4,9 @@ from smarta.utility.led import *
 from threading import Timer
 import logging
 
+# LED blinking times configuration:
+BLINKING_TIME_RED = 0.5
+BLINKING_TIME_YELLOW = 1   # blinking interval of yellow light (signalling end of turn soon)
 
 class TimerCheckState(State):
 

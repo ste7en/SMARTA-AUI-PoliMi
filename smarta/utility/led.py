@@ -14,11 +14,6 @@ class LedColor(Enum):
     OFF = Color(0, 0, 0, 0)
 
 
-# LED blinking times configuration:
-BLINKING_TIME_RED = 0.5
-BLINKING_TIME_YELLOW = 1   # yellow light blinks more slowly
-
-
 class LedManager(object):
     # TODO: - Log and document this class
 
