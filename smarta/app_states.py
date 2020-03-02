@@ -20,12 +20,7 @@ class IdleState(State):
             green = LedThread(LedColor.GREEN, green_light_duration_s, green_light_blinking_time_s)
             green.start()
             green.join()
-            #for i in range(0, 3):
-            #    logging.debug('blink ' + str(i))
-            #    t = GreenLightThread(1)
-            #    t.start()
-            #    t.join()
-            #    time.sleep(0.5)
+
             return RunState(self.machine)
         return self
 
