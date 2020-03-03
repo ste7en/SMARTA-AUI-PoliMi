@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from smarta.smarta_fsm import Smarta
 import logging
 
@@ -28,7 +28,7 @@ def hello_world():
 
 @app.route('/api/', methods=['POST', 'GET'])
 def api():
-
+    return render_template('SetParameters.html')
     return '''
         <form action="/api/start" method="get">
             <p><input type=submit value=Start>         

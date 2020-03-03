@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+	<title> SMARTA Configuration </title>
+</head>
+
+<body>
+	<h1> SMARTA Configuration </h1>
+	<p style="font-size:12px"> Follow these instruction to setup SMARTA
+		<ul style="font-size:12px">
+			<li> Define duration of each turn by filling the boxes below </li>
+			<li> Press the Submit button </li>
+			<li> Start the game! </li>
+		</ul>
+	</p>
+	<h2> Configuration parameters </h2>
+	<form name="setupData" action="" method="POST" style="margin-left:2.5em">
+		<label>
+			<b>How long will each turn last? </b>
+			<br> Enter turn duration in the following boxes: <br>
+		</label>
+		<br>
+		<input type="text" id="duration_min" name="duration_min" placeholder="minutes" size="7" style="text-align: right"/>
+		<a>:</a>
+		<input type="text" id="duration_sec" name="duration_sec" placeholder="seconds" size="7" style="text-align: right"/>
+		<br>
+		<br>
+		<input type="submit" id="TurnDurationInfo" value="Submit"/>
+	</form>
+	<br>
+	<br>
+	<form name="StartGame" action="./OverlapPage.html" method="POST" style="margin-left:2.5em">
+		<label><b>Let's play! </b><br><br></label>
+		<input type="submit" id="StartGameButton" value="START" style="font-size:20px"/>
+	</form>
+</body>
+</html>
