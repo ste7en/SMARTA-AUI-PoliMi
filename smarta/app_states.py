@@ -64,7 +64,7 @@ class RunState(State):
 
     @classmethod
     def set_turn_duration_time(cls, duration_in_sec):
-        logging.debug('Duration time set to {} seconds', duration_in_sec)
+        logging.debug('Duration time set to ' + str(duration_in_sec) + ' seconds')
         cls.__TURN_DURATION_TIME = duration_in_sec
 
     @classmethod

@@ -14,22 +14,21 @@
 		</ul>
 	</p>
 	<h2> Configuration parameters </h2>
-	<form name="setupData" action="" method="POST" style="margin-left:2.5em">
+	<form name="setupData" action='/api/config/set_param' method="post" style="margin-left:2.5em">
 		<label>
 			<b>How long will each turn last? </b>
 			<br> Enter turn duration in the following boxes: <br>
 		</label>
 		<br>
-		<input type="text" id="duration_min" name="duration_min" placeholder="minutes" size="7" style="text-align: right"/>
-		<a>:</a>
-		<input type="text" id="duration_sec" name="duration_sec" placeholder="seconds" size="7" style="text-align: right"/>
+		<input type="number" id="duration_min" name="duration_min" value="{{default_mins}}" min = "0" size="7" style="text-align: right"/> minutes
+		<input type="number" id="duration_sec" name="duration_sec" value="{{default_secs}}" min = "0" size="7" style="text-align: right"/> seconds
 		<br>
 		<br>
 		<input type="submit" id="TurnDurationInfo" value="Submit"/>
 	</form>
 	<br>
 	<br>
-	<form name="StartGame" action="./OverlapPage.html" method="POST" style="margin-left:2.5em">
+	<form name="StartGame" action="/api/start" method="GET" style="margin-left:2.5em">
 		<label><b>Let's play! </b><br><br></label>
 		<input type="submit" id="StartGameButton" value="START" style="font-size:20px"/>
 	</form>

@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 from smarta.smarta_fsm import Smarta
 import logging
 
@@ -28,15 +28,7 @@ def hello_world():
 
 @app.route('/api/', methods=['POST', 'GET'])
 def api():
-    return render_template('SetParameters.html')
-    return '''
-        <form action="/api/start" method="get">
-            <p><input type=submit value=Start>         
-        </form>
-        <form action="/api/stop" method="get">
-            <p><input type=submit value=Stop>         
-        </form>
-    '''
+    return config_page()
 
 
 @app.route('/api/<command>')
@@ -47,3 +39,24 @@ def api_command(command):
     if command == 'stop':
         stop()
         return 'Stop'
+
+
+@app.route('/api/config/set_param', methods=['post'])
+def set_param():
+    if request.method == 'POST':
+        minutes = int(request.form['duration_min'])
+        seconds = int(request.form['duration_sec'])
+        Smarta.set_turn_duration(minutes*60 + seconds)
+    else:
+        logging.error('Invalid HTTP request. Expected: POST, Found: ' + str(request.method))
+    return redirect(url_for('api'))
+
+
+def config_page():
+    minutes = int(Smarta.get_turn_duration() / 60)
+    seconds = Smarta.get_turn_duration() % 60
+    return render_template('SetParameters.html', default_mins=minutes, default_secs=seconds)
+
+
+def start_page():
+    return render_template('OverlapPage.html')

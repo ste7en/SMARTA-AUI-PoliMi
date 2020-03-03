@@ -16,6 +16,14 @@ class Smarta(object):
     def set_turn_duration(turn_duration):
         RunState.set_turn_duration_time(turn_duration)
 
+    @staticmethod
+    def get_turn_duration():
+        '''
+        Returns the default number of seconds for each turn.
+        :return: Integer > 0
+        '''
+        return RunState.get_turn_duration_time()
+
     def on_event(self, event: Event = None) -> None:
         """
         This function calls the State.on_event() func to realize
