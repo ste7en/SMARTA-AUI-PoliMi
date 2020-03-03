@@ -62,6 +62,15 @@ class RunState(State):
     __launch_check_state = None
     __timer_check_state = None
 
+    @classmethod
+    def set_turn_duration_time(cls, duration_in_sec):
+        logging.debug('Duration time set to {} seconds', duration_in_sec)
+        cls.__TURN_DURATION_TIME = duration_in_sec
+
+    @classmethod
+    def get_turn_duration_time(cls):
+        return cls.__TURN_DURATION_TIME
+
     def exit(self):
         logging.debug('RunState - exiting')
         self.__timer_check_state.exit()

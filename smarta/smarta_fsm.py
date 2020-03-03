@@ -12,6 +12,10 @@ class Smarta(object):
     def __init__(self):
         self.__state = IdleState(self)
 
+    @staticmethod
+    def set_turn_duration(turn_duration):
+        RunState.set_turn_duration_time(turn_duration)
+
     def on_event(self, event: Event = None) -> None:
         """
         This function calls the State.on_event() func to realize
