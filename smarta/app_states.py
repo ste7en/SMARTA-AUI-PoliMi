@@ -2,10 +2,11 @@ from smarta.state.state import State
 from smarta.events.events import Event
 from smarta.events.timer import TimerCheckState
 from smarta.events.launch import LaunchCheckState
+from smarta.data.data_manager import DataManager
 from smarta.utility.led import *
 import logging
+import time
 
-# TODO - Prendere turn duration dai dati inseriti dall'utente
 
 class IdleState(State):
     """
@@ -62,6 +63,10 @@ class RunState(State):
     __launch_check_state = None
     __timer_check_state = None
 
+    def __init__(self, machine):
+        super().__init__(machine)
+        self.__start_time = 0
+
     @classmethod
     def set_turn_duration_time(cls, duration_in_sec):
         logging.debug('Duration time set to ' + str(duration_in_sec) + ' seconds')
@@ -75,6 +80,10 @@ class RunState(State):
         logging.debug('RunState - exiting')
         self.__timer_check_state.exit()
         self.__launch_check_state.exit()
+        # The end of a RunState corresponds to the end of a turn,
+        # updating the average turn duration and number of turns
+        elapsed = self.__start_time - time.time()
+        DataManager.get_instance().add_turn(elapsed)
 
     def on_event(self, event) -> State:
         return ResetState(self.machine) if event is Event.TIMER_EXP_EV or Event.LAUNCH_DET_EV else None
@@ -84,6 +93,7 @@ class RunState(State):
         logging.debug('Run State - creating timer and launch detector instance')
         self.__timer_check_state = TimerCheckState(self.machine, self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
         self.__launch_check_state = LaunchCheckState(self.machine)
+        self.__start_time = time.time()
 
 
 class MicCheckState(State):
