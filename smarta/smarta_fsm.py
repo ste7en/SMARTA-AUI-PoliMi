@@ -1,5 +1,6 @@
 from smarta.app_states import *
 from smarta.events.events import Event
+from smarta.data.data_manager import DataManager
 import logging
 import threading
 
@@ -42,10 +43,16 @@ class Smarta(object):
 
     def start(self):
         logging.debug('Application started.')
+        DataManager.clear()
         self.__state.execute()
         self.on_event(Event.START_EV)
 
     def stop(self):
         self.__state.exit()
-        self.__state = None
+        self.__state = IdleState(self)
         logging.debug('Application stopped.')
+
+    @staticmethod
+    def get_summary():
+        dm = DataManager.get_instance()
+        return dm.get_avg_turn_duration(), dm.get_number_of_turns(), dm.get_number_of_overlaps()
