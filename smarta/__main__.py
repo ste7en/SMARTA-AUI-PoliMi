@@ -1,6 +1,10 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
 from markupsafe import escape
-from smarta.smarta_fsm import Smarta
+
+try:
+    from smarta.smarta_fsm import Smarta
+except ImportError:
+    from smarta.mock.testing import Smarta
 import logging
 
 
