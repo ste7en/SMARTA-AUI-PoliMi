@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, abort
+from markupsafe import escape
 from smarta.smarta_fsm import Smarta
 import logging
 
@@ -26,37 +27,48 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/api/', methods=['POST', 'GET'])
-def api():
-    return config_page()
+@app.route('/api/<path:subpath>', methods=['POST', 'GET'])
+def api(subpath=None):
+    command = escape(subpath)
 
-
-@app.route('/api/<command>')
-def api_command(command):
-    if command == 'start':
-        start()
-        return 'Start'
-    if command == 'stop':
-        stop()
-        return 'Stop'
-
-
-@app.route('/api/config/set_param', methods=['post'])
-def set_param():
     if request.method == 'POST':
-        minutes = int(request.form['duration_min'])
-        seconds = int(request.form['duration_sec'])
-        Smarta.set_turn_duration(minutes*60 + seconds)
-    else:
-        logging.error('Invalid HTTP request. Expected: POST, Found: ' + str(request.method))
-    return redirect(url_for('api'))
+        if command == 'config/set_param':
+            minutes = int(request.form['duration_min'])
+            seconds = int(request.form['duration_sec'])
+            Smarta.set_turn_duration(minutes * 60 + seconds)
+            return '', 204
+
+        else:
+            logging.error('Invalid POST request: ' + str(request.url))
+
+    if request.method == 'GET':
+        if command == 'start':
+            start()
+            return redirect(url_for('start_page'))
+        if command == 'stop':
+            stop()
+            return redirect(url_for('stop_page'))
+
+        else:
+            logging.error('Invalid GET request: ' + str(request.url))
+
+    abort(404)
 
 
+@app.route('/api/config')
+@app.route('/api/config/')
 def config_page():
-    minutes = int(Smarta.get_turn_duration() / 60)
-    seconds = Smarta.get_turn_duration() % 60
+    turn_duration = Smarta.get_turn_duration()
+    minutes = int(turn_duration / 60)
+    seconds = turn_duration % 60
     return render_template('SetParameters.html', default_mins=minutes, default_secs=seconds)
 
 
+@app.route('/api/run')
 def start_page():
     return render_template('OverlapPage.html')
+
+
+@app.route('/api/summary')
+def stop_page(avg_duration, n_turns, n_overlaps):
+    return render_template('summary.html', avg_duration=avg_duration, n_turns=n_turns, n_overlaps=n_overlaps)
