@@ -51,7 +51,7 @@ def api(subpath=None):
             return redirect(url_for('start_page'))
         if command == 'stop':
             stop()
-            return redirect(url_for('stop_page'))
+            return redirect(url_for('summary_page'))
 
         else:
             logging.error('Invalid GET request: ' + str(request.url))
@@ -74,5 +74,6 @@ def start_page():
 
 
 @app.route('/api/summary')
-def stop_page(avg_duration, n_turns, n_overlaps):
+def summary_page():
+    avg_duration, n_turns, n_overlaps = application_instance.get_summary()
     return render_template('summary.html', avg_duration=avg_duration, n_turns=n_turns, n_overlaps=n_overlaps)
