@@ -82,7 +82,7 @@ class RunState(State):
         self.__launch_check_state.exit()
         # The end of a RunState corresponds to the end of a turn,
         # updating the average turn duration and number of turns
-        elapsed = self.__start_time - time.time()
+        elapsed = time.time() - self.__start_time
         DataManager.get_instance().add_turn(elapsed)
 
     def on_event(self, event) -> State:
