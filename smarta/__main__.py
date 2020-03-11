@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
 from markupsafe import escape
+from pygtail import Pygtail
+from time import sleep
 
 try:
     from smarta.smarta_fsm import Smarta
@@ -52,7 +54,8 @@ def api(subpath=None):
         if command == 'stop':
             stop()
             return redirect(url_for('summary_page'))
-
+        if command == 'log':
+            return log()
         else:
             logging.error('Invalid GET request: ' + str(request.url))
 
@@ -77,3 +80,13 @@ def start_page():
 def summary_page():
     avg_duration, n_turns, n_overlaps = application_instance.get_summary()
     return render_template('summary.html', avg_duration=avg_duration, n_turns=n_turns, n_overlaps=n_overlaps)
+
+
+def log():
+    def generate():
+        while True:
+            for line in Pygtail('../logs/smarta.log'):
+                yield line
+            sleep(2)
+
+    return app.response_class(generate(), mimetype='text/plain')
