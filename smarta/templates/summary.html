@@ -9,7 +9,7 @@
     <p>
         Statistics <br>
         Number of turns = {{ n_turns }} <br>
-        Average duration of a turn = {{ avg_duration }} <br>
+        Average duration of a turn = {{ round(avg_duration / 60) }} minutes {{ avg_duration % 60 }} seconds<br>
         Number of overlaps = {{ n_overlaps }} <br>
     </p>
 </body>
