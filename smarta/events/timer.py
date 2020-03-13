@@ -1,6 +1,7 @@
 from smarta.state.state import State
 from smarta.events.events import Event
 from smarta.utility.led import *
+from smarta.utility.vibrator_manager import VibratorManager
 from threading import Timer
 import logging
 
@@ -11,24 +12,25 @@ BLINKING_TIME_YELLOW = 1   # blinking interval of yellow light (signalling end o
 
 class TimerCheckState(State):
 
-    def __init__(self, machine, turn_duration, light_duration):
+    def __init__(self, machine, turn_duration, timeout_signalling_duration):
         super().__init__(machine)
 
-        self.light_duration = light_duration   # needed inside yellow_blinking_light function
-        self.timer_start_of_light = turn_duration - light_duration
+        self.timeout_signalling_t = timeout_signalling_duration   # needed inside yellow_blinking_light function
+        self.timer_start_of_light = turn_duration - timeout_signalling_duration
 
-        self.timer_one = Timer(self.timer_start_of_light, self.__yellow_blinking_light)
+        self.timer_one = Timer(self.timer_start_of_light, self.__timeout_is_expiring)
         self.timer_one.start()
 
         logging.debug('TimerCheckState - OK.')
 
-    def __yellow_blinking_light(self):
-        yellow = LedThread(LedColor.YELLOW, self.light_duration, BLINKING_TIME_YELLOW)
+    def __timeout_is_expiring(self):
+        yellow = LedThread(LedColor.YELLOW, self.timeout_signalling_t, BLINKING_TIME_YELLOW)
         yellow.start()
+        VibratorManager.get_instance().vibrate(self.timeout_signalling_t, intermittent=True)
         yellow.join()
-        self.__timeout_expired()
+        self.__timeout_has_expired()
 
-    def __timeout_expired(self):
+    def __timeout_has_expired(self):
         logging.info('TimerCheckState - Timer expired, sending timer expired event...')
         self.machine.on_event(Event.TIMER_EXP_EV)
 
