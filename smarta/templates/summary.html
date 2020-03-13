@@ -9,8 +9,16 @@
     <p>
         Statistics <br>
         Number of turns = {{ n_turns }} <br>
-        Average duration of a turn = {{ round(avg_duration / 60) }} minutes {{ avg_duration % 60 }} seconds<br>
+        Average duration of a turn = {{ avg_duration_min }} minutes {{ avg_duration_sec }} seconds<br>
         Number of overlaps = {{ n_overlaps }} <br>
     </p>
+
+    <form name="GoToConfig" action='/api/config/' method="get" style="margin-left:2.5em">
+		<input type="submit" id="goBack" value="New game" style="font-size:20px"/>
+	</form>
+
+    <form name="AboutPage" action='/about' method="get" style="margin-left:2.5em">
+		<input type="submit" id="about" value="About" style="font-size:20px"/>
+	</form>
 </body>
 </html>

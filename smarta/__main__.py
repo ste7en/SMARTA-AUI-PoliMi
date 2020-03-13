@@ -28,9 +28,11 @@ def stop():
     application_instance.stop()
 
 
+@app.route('/about')
+@app.route('/index')
 @app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def index():
+    return render_template('main.html')
 
 
 @app.route('/api/<path:subpath>', methods=['POST', 'GET'])
@@ -56,6 +58,8 @@ def api(subpath=None):
             return redirect(url_for('summary_page'))
         if command == 'log':
             return log()
+        if command == 'about':
+            return redirect(url_for('index'))
         else:
             logging.error('Invalid GET request: ' + str(request.url))
 
@@ -79,7 +83,10 @@ def start_page():
 @app.route('/api/summary')
 def summary_page():
     avg_duration, n_turns, n_overlaps = application_instance.get_summary()
-    return render_template('summary.html', avg_duration=avg_duration, n_turns=n_turns, n_overlaps=n_overlaps)
+    return render_template('summary.html',
+                           avg_duration_min=round(avg_duration/60),
+                           avg_duration_sec=avg_duration % 60,
+                           n_turns=n_turns, n_overlaps=n_overlaps)
 
 
 def log():
