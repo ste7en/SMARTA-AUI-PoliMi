@@ -9,13 +9,13 @@ class VibratorManager(object):
     """
     __instance = None
     __pin = 8
-    __dc = 50  # duty-cycle
+    __dc_intermittent = 50  # duty-cycle
+    __dc_continuous = 100
     __frequency = 1  # frequency in Hz
 
     def __init__(self):
         if VibratorManager.__instance is None:
             VibratorManager.__instance = self
-            self.__pwm = VibratorManager.__setVibratorPWM()
         else:
             raise Exception("This class is a Singleton")
 
@@ -29,31 +29,33 @@ class VibratorManager(object):
         return VibratorManager.__instance
 
     @staticmethod
-    def __setVibratorPWM():
-        #  GPIO.setwarnings(False)
-        GPIO.cleanup()
+    def __getVibratorPWM():
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(VibratorManager.__pin, GPIO.OUT)
         return GPIO.PWM(VibratorManager.__pin, VibratorManager.__frequency)
 
-    def __runner(self, timeout):
+    @staticmethod
+    def __runner(timeout, intermittent):
         """
         Vibrates with the specified values of duty-cycle and frequency,
         does the GPIO cleanup and then re-instantiate the PWM
         :param timeout: duration of the vibration in seconds
         :return: None
         """
-        self.__pwm.ChangeFrequency(VibratorManager.__frequency)
-        self.__pwm.start(VibratorManager.__dc)
+        pwm = VibratorManager.__getVibratorPWM()
+        # pwm.ChangeFrequency(VibratorManager.__frequency)
+        dc = VibratorManager.__dc_intermittent if intermittent else VibratorManager.__dc_continuous
+        pwm.start(dc)
         time.sleep(timeout)
-        self.__pwm.stop()
+        pwm.stop()
         GPIO.cleanup()
-        self.__pwm = VibratorManager.__setVibratorPWM()
 
-    def vibrate(self, t):
+    @staticmethod
+    def vibrate(t, intermittent=False):
         """
         calls self.__runner(t) in another thread
         :param t: duration of the vibration in seconds
+        :param intermittent: boolean parameter to choose between an intermittent or a continuous vibration
         :return: None
         """
-        threading.Thread(target=self.__runner, args=[t]).start()
+        threading.Thread(target=VibratorManager.__runner, args=[t, intermittent]).start()
