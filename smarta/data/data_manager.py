@@ -33,14 +33,17 @@ class DataManager(object):
         """
         cls.__instance = None
 
-    def add_turn(self, t_time) -> None:
+    def add_turn(self, t_time, new_turn=True) -> None:
         """
         Increments the number of turns played in the game
         and updates the list of turns' duration
         :param t_time: duration of the last turn
+        :param new_turn: True if the turn duration belongs to a new turn
         """
+        if not new_turn:
+            t_time += self.__turn_durations.pop()
+        else: self.__number_of_turns += 1
         self.__turn_durations.append(t_time)
-        self.__number_of_turns += 1
 
     def add_overlap(self) -> None:
         self.__overlaps += 1
