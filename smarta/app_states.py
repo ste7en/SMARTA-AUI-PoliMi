@@ -3,6 +3,7 @@ from smarta.events.events import Event
 from smarta.events.timer import TimerCheckState
 from smarta.events.launch import LaunchCheckState
 from smarta.data.data_manager import DataManager
+from smarta.utility.vibrator_manager import VibratorManager
 from smarta.utility.led import *
 import logging
 import time
@@ -32,14 +33,44 @@ class IdleState(State):
 
 class ResetState(State):
     """
-    Reset state, which restart the machine for a new run
+    Reset state, which restart the machine for a new run but waits
+    if the turn has expired and the ball hasn't been launched yet.
     """
-    __GREEN_LIGHT_TIME = 3  # Duration of time that time green light will be shown, at the start of a new turn
+    __GREEN_LIGHT_TIME = 2  # Duration of time that time green light will be shown, at the start of a new turn
+    __WAIT_BEFORE_SIGNALLING = 2  # Time to wait before signalling the player with red LED and vibration
+    __VIBRATION_DURATION = 1
 
-    def on_event(self, event=None):
-        return RunState(self.machine)
+    def __init__(self, machine, wait_for_launch=True):
+        super().__init__(machine)
+        self.__timer: Timer
+        if wait_for_launch:
+            self.__launch_check_state = LaunchCheckState(self.machine)
+            self.__timer = self.__create_timer()
+            self.__timer.start()
+            self.__start_time = time.time()
+            self.__exit_from_loop = False
+        else:
+            self.__start_new_turn()
 
-    def execute(self):
+    def __create_timer(self) -> Timer:
+        return Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
+
+    def __signal(self):
+        # TODO: - RED LED
+        VibratorManager.get_instance().vibrate(ResetState.__VIBRATION_DURATION)
+        if not self.__exit_from_loop:
+            self.__timer = self.__create_timer()
+            self.__timer.start()
+
+    def on_event(self, event):
+        if event is Event.LAUNCH_DET_EV:
+            elapsed = time.time() - self.__start_time
+            DataManager.get_instance().add_turn(elapsed, new_turn=False)
+            self.__start_new_turn()
+            return RunState(self.machine)
+        return None
+
+    def __start_new_turn(self):
         logging.debug('-------------------')
         logging.debug('Reset State - Green')
         # LED green light
@@ -49,6 +80,11 @@ class ResetState(State):
         logging.debug('Reset State - Green off')
         logging.info('Starting...')
         self.machine.on_event(Event.START_EV)
+
+    def exit(self) -> None:
+        self.__launch_check_state.exit()
+        if self.__timer is Timer: self.__timer.cancel()
+        self.__exit_from_loop = True
 
 
 class RunState(State):
@@ -86,7 +122,9 @@ class RunState(State):
         DataManager.get_instance().add_turn(elapsed)
 
     def on_event(self, event) -> State:
-        return ResetState(self.machine) if event is Event.TIMER_EXP_EV or Event.LAUNCH_DET_EV else None
+        return ResetState(self.machine) if event is Event.TIMER_EXP_EV \
+            else ResetState(self.machine, wait_for_launch=False) if event is Event.LAUNCH_DET_EV \
+            else None
 
     def execute(self):
         # Threads to check gyro/mic/timer
@@ -94,6 +132,7 @@ class RunState(State):
         self.__timer_check_state = TimerCheckState(self.machine, self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
         self.__launch_check_state = LaunchCheckState(self.machine)
         self.__start_time = time.time()
+        VibratorManager.get_instance().vibrate(0.5)
 
 
 class MicCheckState(State):
