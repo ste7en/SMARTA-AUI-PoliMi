@@ -1,3 +1,6 @@
+from statistics import mean
+
+
 class DataManager(object):
     """
     Data manager used by the application to show to the user useful information
@@ -9,7 +12,7 @@ class DataManager(object):
         if DataManager.__instance is None:
             DataManager.__instance = self
             self.__number_of_turns = 0
-            self.__avg_turn_duration = 0
+            self.__turn_durations = []
             self.__overlaps = 0
         else:
             raise Exception("This class is a Singleton")
@@ -32,13 +35,12 @@ class DataManager(object):
 
     def add_turn(self, t_time) -> None:
         """
-        Increments the number of turns played in the game and updates the average turn duration
+        Increments the number of turns played in the game
+        and updates the list of turns' duration
         :param t_time: duration of the last turn
         """
-        old_avg = self.__avg_turn_duration
-        old_turns = self.__number_of_turns
+        self.__turn_durations.append(t_time)
         self.__number_of_turns += 1
-        self.__avg_turn_duration = (old_avg * old_turns + t_time) / self.__number_of_turns
 
     def add_overlap(self) -> None:
         self.__overlaps += 1
@@ -47,7 +49,7 @@ class DataManager(object):
         return self.__number_of_turns
 
     def get_avg_turn_duration(self):
-        return round(self.__avg_turn_duration, 2)
+        return round(mean(self.__turn_durations), 2)
 
     def get_number_of_overlaps(self):
         return self.__overlaps
