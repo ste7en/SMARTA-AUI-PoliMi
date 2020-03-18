@@ -1,7 +1,7 @@
-from smarta.state.state import State
-from smarta.events.events import Event
+from smarta.state import State
+from smarta.events import Event
 from smarta.utility.led import *
-from smarta.utility.vibrator_manager import VibratorManager
+from smarta.utility import VibratorManager
 from threading import Timer
 import logging
 

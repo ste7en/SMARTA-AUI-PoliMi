@@ -1,12 +1,9 @@
 from flask import Flask, request, render_template, redirect, url_for, abort
 from markupsafe import escape
 from pygtail import Pygtail
+from smarta import Smarta
+from smarta import Event
 from time import sleep
-
-try:
-    from smarta.smarta_fsm import Smarta
-except ImportError:
-    from smarta.mock.testing import Smarta
 import logging
 
 

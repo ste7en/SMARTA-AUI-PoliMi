@@ -1,4 +1,4 @@
-from smarta.utility.accellerometer_manager import AccelerometerManager as Accelerometer
+from smarta.utility import AccelerometerManager as Accelerometer
 from math import sqrt
 from statistics import mean
 from threading import Thread

@@ -1,6 +1,6 @@
-from smarta.app_states import *
-from smarta.events.events import Event
-from smarta.data.data_manager import DataManager
+from smarta.state import IdleState, RunState
+from smarta.data import DataManager
+from smarta import Event
 import logging
 import threading
 

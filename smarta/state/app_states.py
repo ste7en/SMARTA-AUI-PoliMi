@@ -1,10 +1,8 @@
-from smarta.state.state import State
-from smarta.events.events import Event
-from smarta.events.timer import TimerCheckState
-from smarta.events.launch import LaunchCheckState
-from smarta.data.data_manager import DataManager
-from smarta.utility.vibrator_manager import VibratorManager
+from smarta.state import State
+from smarta.events import *
+from smarta.utility import VibratorManager
 from smarta.utility.led import *
+from smarta.data import DataManager
 import logging
 import time
 
@@ -124,7 +122,7 @@ class RunState(State):
     def on_event(self, event) -> State:
         return ResetState(self.machine) if event is Event.TIMER_EXP_EV \
             else ResetState(self.machine, wait_for_launch=False) if event is Event.LAUNCH_DET_EV \
-            else None
+            else None  # TODO: - Insert here the voice overlap event
 
     def execute(self):
         # Threads to check gyro/mic/timer
@@ -133,7 +131,3 @@ class RunState(State):
         self.__launch_check_state = LaunchCheckState(self.machine)
         self.__start_time = time.time()
         VibratorManager.get_instance().vibrate(0.5)
-
-
-class MicCheckState(State):
-    pass

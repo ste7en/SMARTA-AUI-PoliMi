@@ -1,4 +1,4 @@
-from smarta.data.data_manager import DataManager
+from smarta.data import DataManager
 import logging
 
 
