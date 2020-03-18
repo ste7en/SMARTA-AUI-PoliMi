@@ -45,7 +45,9 @@ def api(subpath=None):
             seconds = int(request.form['duration_sec'])
             Smarta.set_turn_duration(minutes * 60 + seconds)
             return '', 204
-
+        if command == 'run/send_overlap':
+            application_instance.on_event(Event.VOICE_OVERLAP_DET_EV)
+            return '', 204
         else:
             logging.error('Invalid POST request: ' + str(request.url))
 

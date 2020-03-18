@@ -25,21 +25,20 @@ class Smarta(object):
         '''
         return RunState.get_turn_duration_time()
 
-    def on_event(self, event: Event = None) -> None:
+    def on_event(self, event: Event) -> None:
         """
         This function calls the State.on_event() func to realize
         a transition function for every captured event
         :param event: an acceptable event, as described into events.py
         """
-        if event is None:
-            return
         logging.info('FSM Event processed: ' + str(event))
         # Every state is responsible for its transition table
         next_state = self.__state.on_event(event)
-        self.__state.exit()
-        self.__state = next_state
-        logging.info('Executing next state: ' + str(next_state.__class__.__name__))
-        threading.Thread(target=self.__state.execute).start()
+        if next_state is not None:
+            self.__state.exit()
+            self.__state = next_state
+            logging.info('Executing next state: ' + str(next_state.__class__.__name__))
+            threading.Thread(target=self.__state.execute).start()
 
     def start(self):
         logging.debug('Application started.')
