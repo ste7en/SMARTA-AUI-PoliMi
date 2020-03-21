@@ -4,3 +4,4 @@ try:
     from .smarta_fsm import Smarta
 except ImportError:
     from .mock.testing import Smarta
+    print('Successfully imported Smarta testing class')
