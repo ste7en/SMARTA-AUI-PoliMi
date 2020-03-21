@@ -1,17 +1,18 @@
 from smarta.state import State
 from smarta.events import Event
 from smarta.utility import LaunchDetector
+from smarta.observer import ObservableState, ObserverState
 from math import fabs
 import threading
 import logging
 
 
-class LaunchCheckState(State):
+class LaunchCheckState(ObservableState):
     __threshold_value_phase_one = 0.3
     __threshold_value_phase_two = 0.1
 
-    def __init__(self, machine):
-        super().__init__(machine)
+    def __init__(self):
+        super().__init__()
         self.__launchDetector = LaunchDetector()
         self.__last_vsa_value = None
         self.__launch_phase_started = False
@@ -46,5 +47,10 @@ class LaunchCheckState(State):
                 logging.debug('End of launch detected, delta = ' + str(delta))
                 self.__launch_phase_started = False
                 logging.info('The ball has been launched. Sending a Launch event to FSM...')
-                self.machine.on_event(Event.LAUNCH_DET_EV)
+                self._notify_observer(Event.LAUNCH_DET_EV)
             self.__last_vsa_value = vsa_value
+
+    def detach(self, obs: ObserverState):
+        super().detach(obs)
+        self.__launchDetector.stop()
+        logging.debug('LaunchCheckState - exiting')

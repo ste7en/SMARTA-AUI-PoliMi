@@ -1,8 +1,11 @@
 from smarta.state import State
-from smarta.events import *
+from smarta.events import Event
+from smarta.events.launch import LaunchCheckState
+from smarta.events.timer import TimerCheckState
 from smarta.utility import VibratorManager
 from smarta.utility.led import *
 from smarta.data import DataManager
+from smarta.observer import ObserverState
 import logging
 import time
 
@@ -29,7 +32,7 @@ class IdleState(State):
         LedManager.get_instance().color_wipe(LedColor.OFF)  # Turn off LEDs, if they are on
 
 
-class ResetState(State):
+class ResetState(State, ObserverState):
     """
     Reset state, which restart the machine for a new run but waits
     if the turn has expired and the ball hasn't been launched yet.
@@ -42,13 +45,17 @@ class ResetState(State):
         super().__init__(machine)
         self.__timer: Timer
         if wait_for_launch:
-            self.__launch_check_state = LaunchCheckState(self.machine)
+            self.__launch_check_state = LaunchCheckState()
+            self.__launch_check_state.attach(self)
             self.__timer = self.__create_timer()
             self.__timer.start()
             self.__start_time = time.time()
             self.__exit_from_loop = False
         else:
             self.__start_new_turn()
+
+    def notify(self, event: Event) -> None:
+        self.machine.on_event(event)
 
     def __create_timer(self) -> Timer:
         return Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
@@ -85,7 +92,7 @@ class ResetState(State):
         self.__exit_from_loop = True
 
 
-class RunState(State):
+class RunState(State, ObserverState):
     """
     The main state, which represents the main features
     of the application and its operations
@@ -112,7 +119,7 @@ class RunState(State):
 
     def exit(self):
         logging.debug('RunState - exiting')
-        self.__timer_check_state.exit()
+        self.__timer_check_state.detach(self)
         self.__launch_check_state.exit()
         # The end of a RunState corresponds to the end of a turn,
         # updating the average turn duration and number of turns
@@ -127,7 +134,15 @@ class RunState(State):
     def execute(self):
         # Threads to check gyro/mic/timer
         logging.debug('Run State - creating timer and launch detector instance')
-        self.__timer_check_state = TimerCheckState(self.machine, self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
-        self.__launch_check_state = LaunchCheckState(self.machine)
+        # Timer observer
+        self.__timer_check_state = TimerCheckState(self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
+        self.__timer_check_state.attach(self)
+        # Launch observer
+        self.__launch_check_state = LaunchCheckState()
+        self.__launch_check_state.attach(self)
+
         self.__start_time = time.time()
         VibratorManager.get_instance().vibrate(0.5)
+
+    def notify(self, event: Event) -> None:
+        self.machine.on_event(event)

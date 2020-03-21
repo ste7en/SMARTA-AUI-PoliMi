@@ -1,4 +1,4 @@
-from smarta.utility import AccelerometerManager as Accelerometer
+from smarta.utility import AccelerometerManager
 from math import sqrt
 from statistics import mean
 from threading import Thread
@@ -17,7 +17,7 @@ class LaunchDetector(Thread):
         super().__init__()
         self.__vsa_array = []
         self.__sched = sched.scheduler(time.time, time.sleep)
-        self.__accelerometer = Accelerometer.get_instance()
+        self.__accelerometer = AccelerometerManager.get_instance()
         self.__stopped = False
 
     def _compute_and_store_vsa(self, x, y, z) -> None:
