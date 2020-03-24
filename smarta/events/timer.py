@@ -1,6 +1,5 @@
 from smarta.events import Event
 from smarta.utility.led import *
-from smarta.utility import VibratorManager
 from smarta.observer import ObservableState, ObserverState
 from threading import Timer
 import logging
@@ -24,7 +23,6 @@ class TimerCheckState(ObservableState):
     def __timeout_is_expiring(self):
         yellow = LedThread(LedColor.YELLOW, self.timeout_signalling_t, BLINKING_TIME_YELLOW)
         yellow.start()
-        VibratorManager.get_instance().vibrate(self.timeout_signalling_t, intermittent=True)
         yellow.join()
         self.__timeout_has_expired()
 
