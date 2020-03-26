@@ -2,6 +2,7 @@ from smarta.state import State
 from smarta.events import Event
 from smarta.events.launch import LaunchCheckState
 from smarta.events.timer import TimerCheckState
+from smarta.events.microphone import MicrophoneCheckState
 from smarta.utility import VibratorManager
 from smarta.utility.led import *
 from smarta.data import DataManager
@@ -39,7 +40,6 @@ class ResetState(State, ObserverState):
     """
     __GREEN_LIGHT_TIME = 2  # Duration of time that time green light will be shown, at the start of a new turn
     __WAIT_BEFORE_SIGNALLING = 2  # Time to wait before signalling the player with red LED and vibration
-    __VIBRATION_DURATION = 1
 
     def __init__(self, machine, wait_for_launch=True):
         super().__init__(machine)
@@ -50,7 +50,6 @@ class ResetState(State, ObserverState):
             self.__timer = self.__create_timer()
             self.__timer.start()
             self.__start_time = time.time()
-            self.__exit_from_loop = False
         else:
             self.__start_new_turn()
 
@@ -60,18 +59,13 @@ class ResetState(State, ObserverState):
     def __create_timer(self) -> Timer:
         return Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
 
-    def __signal(self):
-        # TODO: - RED LED
-        VibratorManager.get_instance().vibrate(ResetState.__VIBRATION_DURATION)
-        if not self.__exit_from_loop:
-            self.__timer = self.__create_timer()
-            self.__timer.start()
+    @staticmethod
+    def __signal():
+        # TODO: - Yellow still LED
+        VibratorManager.get_instance().vibrate()
 
     def on_event(self, event):
         if event is Event.LAUNCH_DET_EV:
-            elapsed = time.time() - self.__start_time
-            DataManager.get_instance().add_turn(elapsed, new_turn=False)
-            self.__start_new_turn()
             return RunState(self.machine)
         return None
 
@@ -87,9 +81,12 @@ class ResetState(State, ObserverState):
         self.machine.on_event(Event.START_EV)
 
     def exit(self) -> None:
-        self.__launch_check_state.exit()
         if self.__timer is Timer: self.__timer.cancel()
-        self.__exit_from_loop = True
+        self.__launch_check_state.detach(self)
+        # TODO: - Stop yellow light
+        VibratorManager.get_instance().stop()
+        elapsed = time.time() - self.__start_time
+        DataManager.get_instance().add_turn(elapsed, new_turn=False)
 
 
 class RunState(State, ObserverState):
@@ -103,6 +100,7 @@ class RunState(State, ObserverState):
 
     __launch_check_state = None
     __timer_check_state = None
+    __mic_check_state = None
 
     def __init__(self, machine):
         super().__init__(machine)
@@ -119,17 +117,21 @@ class RunState(State, ObserverState):
 
     def exit(self):
         logging.debug('RunState - exiting')
+        # Detaching observers
         self.__timer_check_state.detach(self)
-        self.__launch_check_state.exit()
+        self.__launch_check_state.detach(self)
+        self.__mic_check_state.detach(self)
         # The end of a RunState corresponds to the end of a turn,
         # updating the average turn duration and number of turns
         elapsed = time.time() - self.__start_time
         DataManager.get_instance().add_turn(elapsed)
 
     def on_event(self, event) -> State:
-        return ResetState(self.machine) if event is Event.TIMER_EXP_EV \
-            else ResetState(self.machine, wait_for_launch=False) if event is Event.LAUNCH_DET_EV \
-            else None  # TODO: - Insert here the voice overlap event
+        if event is Event.VOICE_OVERLAP_DET_EV: self._on_overlap()
+        else:
+            return ResetState(self.machine) if event is Event.TIMER_EXP_EV \
+                else ResetState(self.machine, wait_for_launch=False) if event is Event.LAUNCH_DET_EV \
+                else None
 
     def execute(self):
         # Threads to check gyro/mic/timer
@@ -140,9 +142,17 @@ class RunState(State, ObserverState):
         # Launch observer
         self.__launch_check_state = LaunchCheckState()
         self.__launch_check_state.attach(self)
+        # Voice overlap observer
+        self.__mic_check_state = MicrophoneCheckState()
+        self.__mic_check_state.attach(self)
 
         self.__start_time = time.time()
         VibratorManager.get_instance().vibrate(0.5)
+
+    @staticmethod
+    def _on_overlap():
+        # TODO: - Still red light for 1 sec
+        VibratorManager.get_instance().vibrate(1, intermittent=False)
 
     def notify(self, event: Event) -> None:
         self.machine.on_event(event)

@@ -1,4 +1,3 @@
-from smarta.state import State
 from smarta.events import Event
 from smarta.utility import LaunchDetector
 from smarta.observer import ObservableState, ObserverState
@@ -17,10 +16,6 @@ class LaunchCheckState(ObservableState):
         self.__last_vsa_value = None
         self.__launch_phase_started = False
         self.__execute()
-
-    def exit(self) -> None:
-        self.__launchDetector.stop()
-        logging.debug('LaunchCheckState - exiting')
 
     def __execute(self):
         logging.debug('LaunchCheckState - Starting the LaunchDetector...')
