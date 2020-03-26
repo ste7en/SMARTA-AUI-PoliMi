@@ -1,5 +1,6 @@
 from smarta.state import IdleState, RunState
 from smarta.data import DataManager
+from smarta.utility.led import *
 from smarta import Event
 import logging
 import threading
@@ -19,10 +20,10 @@ class Smarta(object):
 
     @staticmethod
     def get_turn_duration():
-        '''
+        """
         Returns the default number of seconds for each turn.
         :return: Integer > 0
-        '''
+        """
         return RunState.get_turn_duration_time()
 
     def on_event(self, event: Event) -> None:
@@ -49,6 +50,7 @@ class Smarta(object):
     def stop(self):
         self.__state.exit()
         self.__state = IdleState(self)
+        # TODO: - Still blue light for 2 sec
         logging.debug('Application stopped.')
 
     @staticmethod
