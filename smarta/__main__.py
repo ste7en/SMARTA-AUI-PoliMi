@@ -84,7 +84,7 @@ def summary_page():
     avg_duration, n_turns, n_overlaps = application_instance.get_summary()
     return render_template('summary.html',
                            avg_duration_min=round(avg_duration/60),
-                           avg_duration_sec=avg_duration % 60,
+                           avg_duration_sec=round(avg_duration % 60),
                            n_turns=n_turns, n_overlaps=n_overlaps)
 
 
