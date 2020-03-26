@@ -4,10 +4,6 @@ from smarta.observer import ObservableState, ObserverState
 from threading import Timer
 import logging
 
-# LED blinking times configuration:
-BLINKING_TIME_RED = 0.5
-BLINKING_TIME_YELLOW = 1   # blinking interval of yellow light (signalling end of turn soon)
-
 
 class TimerCheckState(ObservableState):
 
@@ -20,8 +16,8 @@ class TimerCheckState(ObservableState):
         self.timer_one.start()
         logging.debug('TimerCheckState - OK.')
 
-    def __timeout_is_expiring(self):
-        yellow = LedThread(LedColor.YELLOW, self.timeout_signalling_t, BLINKING_TIME_YELLOW)
+    def __timeout_is_expiring(self):                                        # warning that turn is over soon:
+        yellow = LedThread(LedColor.YELLOW, self.timeout_signalling_t, 1)   # 5s of yellow light blinking every 1s
         yellow.start()
         yellow.join()
         self.__timeout_has_expired()

@@ -18,12 +18,7 @@ class IdleState(State):
     """
     def on_event(self, event):
         if event == Event.START_EV:
-            logging.debug('Idle State - Green blinking')
-            green_light_duration_s = 6   # start of a turn
-            green_light_blinking_time_s = 1   # blinking time of green light at the start of a turn
-            green = LedThread(LedColor.GREEN, green_light_duration_s, green_light_blinking_time_s)
-            green.start()
-            green.join()
+            logging.debug('Idle State - received Start event')
 
             return RunState(self.machine)
         return self
@@ -44,6 +39,8 @@ class ResetState(State, ObserverState):
     def __init__(self, machine, wait_for_launch=True):
         super().__init__(machine)
         self.__timer: Timer
+        self.yellow = LedThread(LedColor.YELLOW, 30);   # defining yellow light (without starting it yet)
+
         if wait_for_launch:
             self.__launch_check_state = LaunchCheckState()
             self.__launch_check_state.attach(self)
@@ -60,8 +57,8 @@ class ResetState(State, ObserverState):
         return Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
 
     @staticmethod
-    def __signal():
-        # TODO: - Yellow still LED
+    def __signal(self):
+        self.yellow.start()   # start yellow steady light
         VibratorManager.get_instance().vibrate()
 
     def on_event(self, event):
@@ -71,19 +68,14 @@ class ResetState(State, ObserverState):
 
     def __start_new_turn(self):
         logging.debug('-------------------')
-        logging.debug('Reset State - Green')
-        # LED green light
-        green = LedThread(LedColor.GREEN, self.__GREEN_LIGHT_TIME)
-        green.start()
-        green.join()
-        logging.debug('Reset State - Green off')
-        logging.info('Starting...')
+        logging.debug('Reset State')
+
         self.machine.on_event(Event.START_EV)
 
     def exit(self) -> None:
         if self.__timer is Timer: self.__timer.cancel()
         self.__launch_check_state.detach(self)
-        # TODO: - Stop yellow light
+        self.yellow.running = False   # stop yellow steady light
         VibratorManager.get_instance().stop()
         elapsed = time.time() - self.__start_time
         DataManager.get_instance().add_turn(elapsed, new_turn=False)
@@ -129,11 +121,14 @@ class RunState(State, ObserverState):
     def on_event(self, event) -> State:
         if event is Event.VOICE_OVERLAP_DET_EV: self._on_overlap()
         else:
-            return ResetState(self.machine) if event is Event.TIMER_EXP_EV \
-                else ResetState(self.machine, wait_for_launch=False) if event is Event.LAUNCH_DET_EV \
+            return RunState(self.machine) if event is Event.LAUNCH_DET_EV \
+                else ResetState(self.machine) if event is Event.TIMER_EXP_EV \
                 else None
 
     def execute(self):
+        green = LedThread(LedColor.GREEN, 2, 0.5)  # green light lasting 2s, blinking every 0.5s, to signal new turn
+        green.start()
+
         # Threads to check gyro/mic/timer
         logging.debug('Run State - creating timer and launch detector instance')
         # Timer observer
@@ -151,7 +146,8 @@ class RunState(State, ObserverState):
 
     @staticmethod
     def _on_overlap():
-        # TODO: - Still red light for 1 sec
+        red = LedThread(LedColor.RED, 1)   # on overlap: red steady light for 1 second
+        red.start()
         VibratorManager.get_instance().vibrate(1, intermittent=False)
 
     def notify(self, event: Event) -> None:
