@@ -65,7 +65,7 @@ class ResetState(State, ObserverState):
         VibratorManager.get_instance().vibrate()
 
     def on_event(self, event):
-        if event is Event.LAUNCH_DET_EV:
+        if event is Event.LAUNCH_DET_EV or Event.START_EV:
             return RunState(self.machine)
         return None
 
