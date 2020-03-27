@@ -41,6 +41,9 @@ class Smarta(object):
     def stop(self):
         logging.debug('Application stopped.')
 
+    def is_running(self):
+        return False
+
     @staticmethod
     def get_summary():
         dm = DataManager.get_instance()

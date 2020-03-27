@@ -17,12 +17,12 @@ logging.debug('Flask WebInterface started')
 
 def start():
     logging.info('HTTP Client started the application')
-    application_instance.start()
+    if not application_instance.is_running(): application_instance.start()
 
 
 def stop():
     logging.info('HTTP Client stopped the application')
-    application_instance.stop()
+    if application_instance.is_running(): application_instance.stop()
 
 
 @app.route('/about')

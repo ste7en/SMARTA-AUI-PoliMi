@@ -50,9 +50,12 @@ class Smarta(object):
     def stop(self):
         self.__state.exit()
         self.__state = IdleState(self)
-        blue = LedThread(LedColor.BLUE, 2);   # steady blue light lasting 2s to signal end of game
-        blue.start();
+        blue = LedThread(LedColor.BLUE, 2)   # steady blue light lasting 2s to signal end of game
+        blue.start()
         logging.debug('Application stopped.')
+
+    def is_running(self):
+        return self.__state is not IdleState
 
     @staticmethod
     def get_summary():
