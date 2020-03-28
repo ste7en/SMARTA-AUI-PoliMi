@@ -52,7 +52,7 @@ class DataManager(object):
         return self.__number_of_turns
 
     def get_avg_turn_duration(self):
-        return round(mean(self.__turn_durations), 2)
+        return 0 if len(self.__turn_durations) == 0 else round(mean(self.__turn_durations), 2)
 
     def get_number_of_overlaps(self):
         return self.__overlaps
