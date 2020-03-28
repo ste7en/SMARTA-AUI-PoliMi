@@ -30,35 +30,31 @@ class IdleState(State):
 
 class ResetState(State, ObserverState):
     """
-    Reset state, which restart the machine for a new run but waits
-    if the turn has expired and the ball hasn't been launched yet.
+    Reset state, which restart the machine for a new run and waits
+    when the turn has expired and the ball hasn't been launched yet.
     """
     __GREEN_LIGHT_TIME = 2  # Duration of time that time green light will be shown, at the start of a new turn
     __WAIT_BEFORE_SIGNALLING = 2  # Time to wait before signalling the player with red LED and vibration
 
-    def __init__(self, machine, wait_for_launch=True):
+    def __init__(self, machine):
         super().__init__(machine)
-        self.__timer: Timer
-        self.yellow = LedThread(LedColor.YELLOW, 30);   # defining yellow light (without starting it yet)
 
-        if wait_for_launch:
-            self.__launch_check_state = LaunchCheckState()
-            self.__launch_check_state.attach(self)
-            self.__timer = self.__create_timer()
-            self.__timer.start()
-            self.__start_time = time.time()
-        else:
-            self.__start_new_turn()
+        self.__yellow = LedThread(LedColor.YELLOW, 30)  # defining yellow light (without starting it yet)
+
+        self.__launch_check_state = LaunchCheckState()
+        self.__launch_check_state.attach(self)
+
+        self.__timer = Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
+        self.__timer.start()
+
+        self.__start_time = time.time()
 
     def notify(self, event: Event) -> None:
         self.machine.on_event(event)
 
-    def __create_timer(self) -> Timer:
-        return Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
-
     @staticmethod
     def __signal(self):
-        self.yellow.start()   # start yellow steady light
+        self.yellow.start()  # start yellow steady light
         VibratorManager.get_instance().vibrate()
 
     def on_event(self, event):
@@ -66,16 +62,10 @@ class ResetState(State, ObserverState):
             return RunState(self.machine)
         return None
 
-    def __start_new_turn(self):
-        logging.debug('-------------------')
-        logging.debug('Reset State')
-
-        self.machine.on_event(Event.START_EV)
-
     def exit(self) -> None:
-        if self.__timer is Timer: self.__timer.cancel()
+        if self.__timer.is_alive(): self.__timer.cancel()
         self.__launch_check_state.detach(self)
-        self.yellow.running = False   # stop yellow steady light
+        self.__yellow.running = False   # stop yellow steady light
         VibratorManager.get_instance().stop()
         elapsed = time.time() - self.__start_time
         DataManager.get_instance().add_turn(elapsed, new_turn=False)
