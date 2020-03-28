@@ -4,11 +4,12 @@ from smarta.observer import ObservableState, ObserverState
 from math import fabs
 import threading
 import logging
+import time
 
 
 class LaunchCheckState(ObservableState):
     __threshold_value_phase_one = 0.3
-    __threshold_value_phase_two = 0.1
+    __threshold_value_phase_two = 0.15
 
     def __init__(self):
         super().__init__()
@@ -44,6 +45,7 @@ class LaunchCheckState(ObservableState):
                 logging.info('The ball has been launched. Sending a Launch event to FSM...')
                 self._notify_observer(Event.LAUNCH_DET_EV)
             self.__last_vsa_value = vsa_value
+            time.sleep(0.2)
 
     def detach(self, obs: ObserverState):
         super().detach(obs)
