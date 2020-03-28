@@ -55,7 +55,7 @@ class Smarta(object):
         logging.debug('Application stopped.')
 
     def is_running(self):
-        return self.__state is not IdleState
+        return self.__state.__class__ is not IdleState
 
     @staticmethod
     def get_summary():
