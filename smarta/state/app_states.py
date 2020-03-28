@@ -52,9 +52,8 @@ class ResetState(State, ObserverState):
     def notify(self, event: Event) -> None:
         self.machine.on_event(event)
 
-    @staticmethod
     def __signal(self):
-        self.yellow.start()  # start yellow steady light
+        self.__yellow.start()  # start yellow steady light
         VibratorManager.get_instance().vibrate()
 
     def on_event(self, event):
@@ -114,6 +113,7 @@ class RunState(State, ObserverState):
             return RunState(self.machine) if event is Event.LAUNCH_DET_EV \
                 else ResetState(self.machine) if event is Event.TIMER_EXP_EV \
                 else None
+        return None
 
     def execute(self):
         green = LedThread(LedColor.GREEN, 2, 0.5)  # green light lasting 2s, blinking every 0.5s, to signal new turn
