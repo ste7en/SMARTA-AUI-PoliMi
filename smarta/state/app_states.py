@@ -36,18 +36,10 @@ class ResetState(State, ObserverState):
     __GREEN_LIGHT_TIME = 2  # Duration of time that time green light will be shown, at the start of a new turn
     __WAIT_BEFORE_SIGNALLING = 2  # Time to wait before signalling the player with red LED and vibration
 
-    def __init__(self, machine):
-        super().__init__(machine)
-
-        self.__yellow = LedThread(LedColor.YELLOW, 30)  # defining yellow light (without starting it yet)
-
-        self.__launch_check_state = LaunchCheckState()
-        self.__launch_check_state.attach(self)
-
-        self.__timer = Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
-        self.__timer.start()
-
-        self.__start_time = time.time()
+    __yellow: Thread
+    __launch_check_state: LaunchCheckState
+    __timer: Timer
+    __start_time: float
 
     def notify(self, event: Event) -> None:
         self.machine.on_event(event)
@@ -69,6 +61,18 @@ class ResetState(State, ObserverState):
         elapsed = time.time() - self.__start_time
         DataManager.get_instance().add_turn(elapsed, new_turn=False)
 
+    def execute(self) -> None:
+        super().execute()
+        self.__yellow = LedThread(LedColor.YELLOW, 30)  # defining yellow light (without starting it yet)
+
+        self.__launch_check_state = LaunchCheckState()
+        self.__launch_check_state.attach(self)
+
+        self.__timer = Timer(ResetState.__WAIT_BEFORE_SIGNALLING, self.__signal)
+        self.__timer.start()
+
+        self.__start_time = time.time()
+
 
 class RunState(State, ObserverState):
     """
@@ -82,10 +86,7 @@ class RunState(State, ObserverState):
     __launch_check_state = None
     __timer_check_state = None
     __mic_check_state = None
-
-    def __init__(self, machine):
-        super().__init__(machine)
-        self.__start_time = 0
+    __start_time = 0
 
     @classmethod
     def set_turn_duration_time(cls, duration_in_sec):
@@ -116,11 +117,12 @@ class RunState(State, ObserverState):
         return None
 
     def execute(self):
+        logging.info('-------- Turn n. %s --------', DataManager.get_instance().get_number_of_turns())
         green = LedThread(LedColor.GREEN, 2, 0.5)  # green light lasting 2s, blinking every 0.5s, to signal new turn
         green.start()
 
         # Threads to check gyro/mic/timer
-        logging.debug('Run State - creating timer and launch detector instance')
+        logging.debug('Run State - creating timer, launch detector and overlap detector instance')
         # Timer observer
         self.__timer_check_state = TimerCheckState(self.__TURN_DURATION_TIME, self.__YELLOW_LIGHT_TIME)
         self.__timer_check_state.attach(self)
