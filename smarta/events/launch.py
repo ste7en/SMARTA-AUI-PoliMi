@@ -36,10 +36,10 @@ class LaunchCheckState(ObservableState):
                 return
             delta = fabs(vsa_value - self.__last_vsa_value)
             # print('delta =', delta)
-            if delta > self.__threshold_value_phase_one and self.__launch_phase_started is False:
+            if not self.__launch_phase_started and delta > self.__threshold_value_phase_one:
                 logging.debug('Launch detected, delta = ' + str(delta))
                 self.__launch_phase_started = True
-            if delta < self.__threshold_value_phase_two and self.__launch_phase_started:
+            if self.__launch_phase_started and delta < self.__threshold_value_phase_two:
                 logging.debug('End of launch detected, delta = ' + str(delta))
                 self.__launch_phase_started = False
                 logging.info('The ball has been launched. Sending a Launch event to FSM...')
