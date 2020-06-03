@@ -1,21 +1,216 @@
 <!DOCTYPE html>
-<html lang="eng">
+<html lang="en">
 <head>
-	<title> Smarta is activated! </title>
+  <meta charset="UTF-8">
+  <title>overlapPage</title>
 </head>
+
+<style>
+body {
+  background-color: #2B3146;
+  background-image: url('images/CloudShapeBackground_2.png'), url('images/cazziarelli.png'), url('images/CloudShapeBackground_1.png');
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-attachment: fixed;
+  background-size: fixed;
+  background-position: right bottom, right bottom, right bottom;
+}
+
+table{
+  position: relative;
+  top: 50px;
+  width: 95%;
+}
+
+tr,td {
+
+}
+.align-center{
+  text-align: center;
+}
+.align-left{
+  text-align: left;
+}
+img.LogoSmarta{
+  width: 150px;
+}
+
+.due_colonne{
+  width:50%;
+  position:relative;
+}
+
+h1{
+  color: #FBCC83;
+  font-family: Bodoni MT;
+  font-size: 250%;
+  position: relative;
+  margin-top: 12%;
+}
+p{
+  color: #EDEDEC;
+  font-family: Bodoni MT;
+  font-size: 120%;
+  position: relative;
+  line-height: 30px;
+  letter-spacing: 2px;
+}
+
+.width-80{
+  width: 80%;
+}
+
+.overlap_button{
+  font-size:20px;
+  padding-left: 3%;
+  padding-right: 3%;
+  padding-top: 25%;
+  padding-bottom: 25%;
+  background-color: #F15175;
+  border: none;
+  border-radius: 50%;
+
+  color:  #EDEDEC;
+  text-align: center;
+  font-size: 130%;
+  font-family: Bodoni MT;
+  box-shadow: 0px 1px 4px #1B2133;
+  letter-spacing: 2px;
+}
+
+.end_button{
+  font-size: 20px;
+  padding: 10px;
+  background-color: #9DBA90;
+  border: none;
+  border-radius: 5px;
+  color:  #EDEDEC;
+  text-align: center;
+  font-size: 130%;
+  font-family: Bodoni MT;
+  box-shadow: 0px 1px 4px #1B2133;
+  letter-spacing: 2px;
+  margin-top: 12%;
+}
+
+.column {
+  float: left;
+  width: 3%;
+  padding: 0px;
+}
+.row{
+  position:fixed;
+  bottom:0px;
+  left:2%;
+}
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.Fabiana {
+  color: #9DBA90;
+  font-family: Bodoni MT;
+  font-size: 75%;
+  position: relative;
+}
+.Elena {
+  color: #FBCC83;
+  font-family: Bodoni MT;
+  font-size: 75%;
+  position: relative;
+}
+.Marta {
+  color: #9C67AF;
+  font-family: Bodoni MT;
+  font-size: 75%;
+  position: relative;
+}
+.Stefano {
+  color: #F15175;
+  font-family: Bodoni MT;
+  font-size: 75%;
+  position: relative;
+}
+
+.allineamento{
+
+  display: inline-block;
+}
+</style>
+
 <body>
-	<h1> SMARTA is activated!</h1>
-	<p style="margin-left:2.5em"> While the kids are playing, pay attention and signal when
-		<br> they <b>interrupt eachother</b> by pressing on the button below <br>at each occurrence 
-	</p>
-	<br>
-	<br>
-	<form name=”SignalOverlap” action="/api/run/send_overlap" method="POST" style="margin-left:2.5em">
-		<input type="submit" id="OverlapButton" value="OVERLAP" style="font-size:20px"/>
-	</form>
-    <br>
-    <form name=”CallSummaryPage” action="/api/stop" method="GET" style="margin-left:2.5em">
-		<input type="submit" id="CallSummaryPage" value="END GAME" style="font-size:20px"/>
-	</form>
+  <table align="right">
+    <tr >
+      <td>
+        <img src="images/LogoSmarta.png" class="LogoSmarta" alt="LogoSmarta">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h1> SMARTA is activated!</h1>
+      </td>
+    </tr>
+    <tr>
+      <td class="due_colonne">
+        <p class="width-80">
+          While the kids are playing, pay attention and signal when
+          they <b>interrupt eachother</b> by pressing on the button
+          below at each occurrence.
+        </p>
+      </td>
+      <td class="due_colonne align-left">
+        <div class="allineamento align-center">
+          <form name=”SignalOverlap” action="/run/send_overlap" method="POST">
+            <input class="overlap_button" type="submit" id="OverlapButton" value="OVERLAP" />
+          </form>
+          <p id="counterOverlaps">Overlaps detected: 0<p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td align="center">
+          <form name=”CallSummaryPage” action="/api/stop" method="GET">
+            <input class="end_button" type="submit" id="CallSummaryPage" value="END GAME" />
+          </form>
+        </td>
+      </tr>
+    </table>
+
+    <div style="text-align:center;padding-top:80px">
+      <div class="row">
+        <div class="column">
+          <img src="images/BabaFab.png" alt="Fabiana" style="width:75%">
+          <br>
+          <a class="Fabiana">FF</a>
+        </div>
+        <div class="column">
+          <img src="images/BabaElena.png" alt="Elena" style="width:75%">
+          <br>
+          <a class="Elena">EP</a>
+        </div>
+        <div class="column">
+          <img src="images/BabaMarta.png" alt="Marta" style="width:75%">
+          <br>
+          <a class="Marta">MM</a>
+        </div>
+        <div class="column">
+          <img src="images/BabaSte.png" alt="Stefano" style="width:75%">
+          <br>
+          <a class="Stefano">SF</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    var button = document.getElementById("OverlapButton"),
+    textSpace = document.getElementById("counterOverlaps")
+    count = 0;
+    button.onclick = function() {
+      count += 1;
+      textSpace.innerHTML = "Overlaps detected: " + count;
+    };
+  </script>
+
 </body>
 </html>

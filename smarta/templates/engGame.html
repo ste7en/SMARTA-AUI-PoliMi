@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>endGamePage</title>
+</head>
+
+<style>
+	body {
+
+      background-color: #2B3146;
+			background-image: url('images/CloudShapeBackground_2.png'), url('images/cazzarielliFinal.png'), url('images/CloudShapeBackground_1.png'), url('images/trio_laser.png'), url('images/duo_laser.png');
+			background-repeat: no-repeat, repeat, no-repeat, no-repeat, no-repeat;
+			background-attachment: fixed;
+			background-size: fixed;
+			background-position: right bottom, right bottom, right bottom, right top, left bottom;
+	}
+	table{
+		position: relative;
+		top: 50px;
+		width: 95%;
+	}
+
+tr,td {
+}
+
+	img.LogoSmarta{
+		width: 150px;
+	}
+	.due_colonne{
+		width:50%;
+	}
+	h1.endGame{
+		color: #F15175;
+		font-family: Bodoni MT;
+		font-size: 250%;
+		position: relative;
+		margin-top: 5%;
+    margin-bottom: 10%;
+    text-shadow: 0px 1px 4px #1B2133;
+	}
+  h1.Summary{
+		color: #9DBA90;
+		font-family: Bodoni MT;
+		font-size: 250%;
+		position: relative;
+    text-shadow: 0px 1px 4px #1B2133;
+	}
+	p{
+		width: 100%;
+		color: #EDEDEC;
+		font-family: Bodoni MT;
+		font-size: 110%;
+		position: relative;
+		line-height: 30px;
+		letter-spacing: 2px;
+	}
+  .SummaryBox{
+    position: relative;
+    text-align: left;
+    font-family: Bodoni MT;
+    display: inline-block;
+    border-radius: 5px;
+    width: 50%;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    padding-left: 3%;
+    background-color: #9DBA90;
+    letter-spacing: 0.5px;
+  }
+  #goBack{
+	  font-size: 20px;
+		padding: 10px;
+		background-color: #9C67AF;
+		border: none;
+		border-radius: 5px;
+		color:  #EDEDEC;
+		text-align: center;
+		font-size: 130%;
+		font-family: Bodoni MT;
+		box-shadow: 0px 1px 4px #1B2133;
+		letter-spacing: 2px;
+		margin-top: 3%;
+	}
+	.column {
+      float: left;
+      width: 3%;
+      padding: 0px;
+    }
+	.row{
+		position:fixed;
+		bottom:0px;
+		left:2%;
+	}
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+	.Fabiana {
+		color: #9DBA90;
+		font-family: Bodoni MT;
+		font-size: 75%;
+		position: relative;
+    }
+    .Elena {
+		color: #FBCC83;
+		font-family: Bodoni MT;
+		font-size: 75%;
+		position: relative;
+    }
+    .Marta {
+		color: #9C67AF;
+		font-family: Bodoni MT;
+		font-size: 75%;
+		position: relative;
+    }
+    .Stefano {
+		color: #F15175;
+		font-family: Bodoni MT;
+		font-size: 75%;
+		position: relative;
+    }
+</style>
+
+<body>
+	<table align="center">
+		<tr >
+			<td>
+				<img src="images/LogoSmarta.png" class="LogoSmarta" alt="LogoSmarta">
+			</td>
+		</tr>
+		<tr>
+			<td align="center" class="bg">
+
+				<h1 class="endGame"> end game!</h1>
+			</td>
+		</tr>
+
+		<tr>
+			<td align="center">
+				<h1 class="Summary"> summary</h1>
+			</td>
+		</tr>
+
+    <tr>
+      <td align="center" class="SummaryResults">
+        <div align="center" class="SummaryBox">
+        <p>
+        Number of turns = {{n_turns}} <br>
+        Average duration of a turn = {{a_d_m}} ' {{a_d_s}} " <br>
+        Number of overlaps = {{n_overlaps}} <br>
+      </p>
+      </div>
+      </td>
+    </tr>
+<tr>
+  <td align="center">
+    <form name="GoToConfig" action='/api/config/' method="get">
+		<input type="submit" id="goBack" value="New game"/>
+	  </form>
+  </td>
+</tr>
+
+	</table>
+
+	<div style="text-align:center;padding-top:80px">
+		<div class="row">
+			<div class="column">
+			  <img src="images/BabaFab.png" alt="Fabiana" style="width:75%">
+			  <br>
+			  <a class="Fabiana">FF</a>
+			</div>
+			<div class="column">
+			  <img src="images/BabaElena.png" alt="Elena" style="width:75%">
+			  <br>
+			  <a class="Elena">EP</a>
+			</div>
+			<div class="column">
+			  <img src="images/BabaMarta.png" alt="Marta" style="width:75%">
+			  <br>
+			  <a class="Marta">MM</a>
+			</div>
+			<div class="column">
+			  <img src="images/BabaSte.png" alt="Stefano" style="width:75%">
+			  <br>
+			  <a class="Stefano">SF</a>
+			</div>
+      </div>
+    </div>
+</body>
+</html>
+</body>
