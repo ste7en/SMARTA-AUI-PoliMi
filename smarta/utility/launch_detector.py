@@ -11,7 +11,7 @@ import logging
 class LaunchDetector(Thread):
     # TODO: - Log and document this class
     __queue_length = 5
-    __acquisition_period_in_seconds = 0.2
+    __acquisition_period_in_seconds = 0.25
 
     def __init__(self):
         super().__init__()
@@ -59,7 +59,7 @@ class LaunchDetector(Thread):
         z = self.__accelerometer.get_accel_z()  # get_gyro_z()
         self._compute_and_store_vsa(x, y, z)
         if not self.__stopped:
-            time.sleep(0.05)
+            # time.sleep(0.05) changed by setting __acquisition_period_in_seconds from 0.2 to 0.25
             self._enter_scheduler()
 
     def _enter_scheduler(self) -> None:
