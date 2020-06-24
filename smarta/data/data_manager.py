@@ -1,4 +1,7 @@
 from statistics import mean
+from datetime import date
+import logging
+import json
 
 
 class DataManager(object):
@@ -14,6 +17,8 @@ class DataManager(object):
             self.__number_of_turns = 0
             self.__turn_durations = []
             self.__overlaps = 0
+            self.__archive = self._load_archive()
+            self.__current_team_name = "NewTeam"
         else:
             raise Exception("This class is a Singleton")
 
@@ -32,6 +37,36 @@ class DataManager(object):
         Deletes the DataManager instance of the singleton
         """
         cls.__instance = None
+
+    def _load_archive(self):
+        with open("data/archive.json") as data:
+            logging.info("Data loading...")
+            return json.load(data)
+
+    def _dump_archive(self):
+        logging.info("Saving data...")
+        with open("data/archive.json", "w") as file:
+            json.dump(self.__archive, file)
+            logging.info("Data successfully saved.")
+
+    def get_archived_teams(self):
+        return list(self.__archive.keys())
+
+    def get_team_history(self, team_name):
+        return self.__archive.get(team_name)
+
+    def set_team_name(self, name):
+        self.__current_team_name = name
+
+    def game_ended(self):
+        s = {'date': date.today().strftime("%d/%m/%y"),
+             'n_of_turns': self.get_number_of_turns(),
+             'avg_turn_length': str(self.get_avg_turn_duration()),
+             'overlaps_detected': self.get_number_of_overlaps()
+             }
+        if self.__archive.get(self.__current_team_name) is None:
+            self.__archive[self.__current_team_name] = []
+        self.__archive.get(self.__current_team_name).insert(0, s)
 
     def add_turn(self, t_time, new_turn=True) -> None:
         """

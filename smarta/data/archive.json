@@ -1,0 +1,32 @@
+{
+  "Team1": [
+    {
+      "date": "24/06/20",
+      "n_of_turns": 12,
+      "avg_turn_length": "1:30",
+      "overlaps_detected": 2
+    }
+  ],
+  "Team2": [
+    {
+      "date": "12/12/19",
+      "n_of_turns": 10,
+      "avg_turn_length": "0:42",
+      "overlaps_detected": 2
+    },
+    {
+      "date": "13/12/19",
+      "n_of_turns": 3,
+      "avg_turn_length": "0:30",
+      "overlaps_detected": 0
+    }
+  ],
+  "Marta, Elena, Fabiana": [
+    {
+      "date": "20/04/20",
+      "n_of_turns": 12,
+      "avg_turn_length": "1:30",
+      "overlaps_detected": 4
+    }
+  ]
+}
