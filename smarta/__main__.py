@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, abort
+from flask import Flask, request, render_template, redirect, url_for, abort, send_from_directory
 from markupsafe import escape
 from pygtail import Pygtail
 from smarta import Smarta
@@ -13,6 +13,11 @@ app = Flask(__name__)
 application_instance = Smarta()
 
 logging.debug('Flask WebInterface started')
+
+
+@app.route('/images/<path:path>')
+def send_images(path):
+    return send_from_directory('./templates/images', path)
 
 
 def start():
@@ -55,6 +60,8 @@ def api(subpath=None):
         if command == 'stop':
             stop()
             return redirect(url_for('summary_page'))
+        if command == 'archive':
+            return render_template('archive.html')
         if command == 'log':
             return log()
         if command == 'about':
