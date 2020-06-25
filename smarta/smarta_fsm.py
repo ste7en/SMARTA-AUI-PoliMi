@@ -63,3 +63,13 @@ class Smarta(object):
     def get_summary():
         dm = DataManager.get_instance()
         return dm.get_avg_turn_duration(), dm.get_number_of_turns(), dm.get_number_of_overlaps()
+
+    @staticmethod
+    def get_archived_teams():
+        dm = DataManager.get_instance()
+        return dm.get_archived_teams()
+
+    @staticmethod
+    def get_team_history(team_name):
+        dm = DataManager.get_instance()
+        return dm.get_team_history(team_name)

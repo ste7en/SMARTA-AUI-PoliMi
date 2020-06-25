@@ -5,6 +5,7 @@ from smarta import Smarta
 from smarta import Event
 from time import sleep
 import logging
+import json
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -71,10 +72,18 @@ def api(subpath=None):
             return log()
         if command == 'about':
             return redirect(url_for('index'))
+        if command == 'archived-teams':
+            return json.dumps(application_instance.get_archived_teams())
         else:
             logging.error('Invalid GET request: ' + str(request.url))
 
     abort(404)
+
+
+@app.route('/api/team-history', methods=['POST'])
+def api_team_history():
+    team_name = request.form['team_name']
+    return json.dumps(application_instance.get_team_history(team_name))
 
 
 @app.route('/api/config')
