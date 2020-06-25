@@ -20,6 +20,11 @@ def send_images(path):
     return send_from_directory('./templates/images', path)
 
 
+@app.route('/js/<path:path>')
+def send_js(path):
+    return send_from_directory('./templates/js', path)
+
+
 def start():
     logging.info('HTTP Client started the application')
     if not application_instance.is_running(): application_instance.start()
