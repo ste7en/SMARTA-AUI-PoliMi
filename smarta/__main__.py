@@ -56,6 +56,9 @@ def api(subpath=None):
         if command == 'run/send_overlap':
             application_instance.on_event(Event.VOICE_OVERLAP_DET_EV)
             return '', 204
+        if command == 'set-team-name':
+            application_instance.set_team_name(request.form['team_name'])
+            return '', 204
         else:
             logging.error('Invalid POST request: ' + str(request.url))
 

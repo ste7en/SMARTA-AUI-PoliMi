@@ -73,3 +73,9 @@ class Smarta(object):
     def get_team_history(team_name):
         dm = DataManager.get_instance()
         return dm.get_team_history(team_name)
+
+    @staticmethod
+    def set_team_name(team_name):
+        dm = DataManager.get_instance()
+        dm.set_team_name(team_name)
+        logging.info('Team name set to ' + team_name)
