@@ -138,6 +138,7 @@ class RunState(State, ObserverState):
 
     @staticmethod
     def _on_overlap():
+        DataManager.get_instance().add_overlap();
         red = LedThread(LedColor.RED, 1)   # on overlap: red steady light for 1 second
         red.start()
         VibratorManager.get_instance().vibrate(1, intermittent=False)
