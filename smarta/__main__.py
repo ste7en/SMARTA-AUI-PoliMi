@@ -106,9 +106,9 @@ def start_page():
 @app.route('/api/summary')
 def summary_page():
     avg_duration, n_turns, n_overlaps = application_instance.get_summary()
-    return render_template('summary.html',
-                           avg_duration_min=round(avg_duration/60),
-                           avg_duration_sec=round(avg_duration % 60),
+    return render_template('endGame.html',
+                           a_d_m=round(avg_duration/60),
+                           a_d_s=round(avg_duration % 60),
                            n_turns=n_turns, n_overlaps=n_overlaps)
 
 
