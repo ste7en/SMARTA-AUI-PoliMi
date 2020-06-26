@@ -67,6 +67,7 @@ class DataManager(object):
         if self.__archive.get(self.__current_team_name) is None:
             self.__archive[self.__current_team_name] = []
         self.__archive.get(self.__current_team_name).insert(0, s)
+        self._dump_archive()
 
     def add_turn(self, t_time, new_turn=True) -> None:
         """
