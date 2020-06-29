@@ -34,9 +34,11 @@ class DataManager(object):
     @classmethod
     def clear(cls):
         """
-        Deletes the DataManager instance of the singleton
+        Clears the DataManager singleton instance
         """
-        cls.__instance = None
+        cls.get_instance().__number_of_turns = 0
+        cls.get_instance().__turn_durations = []
+        cls.get_instance().__overlaps = 0
 
     def _load_archive(self):
         with open("data/archive.json") as data:
@@ -56,12 +58,13 @@ class DataManager(object):
         return self.__archive.get(team_name)
 
     def set_team_name(self, name):
-        self.__current_team_name = name
+        self.get_instance().__current_team_name = name
 
     def game_ended(self):
+        avg_turn_secs = self.get_avg_turn_duration()
         s = {'date': date.today().strftime("%d/%m/%y"),
              'n_of_turns': self.get_number_of_turns(),
-             'avg_turn_length': str(self.get_avg_turn_duration()),
+             'avg_turn_length': str(int(avg_turn_secs / 60))+":"+str(int(avg_turn_secs % 60)),
              'overlaps_detected': self.get_number_of_overlaps()
              }
         if self.__archive.get(self.__current_team_name) is None:
