@@ -1,4 +1,4 @@
-# Smarta – A smart ball to teach turn-taking
+# Smarta – A smart ball to teach turn-taking 🏀💬
 
 Smarta is a project developed during the MSc. in Computer Science and Engineering (Human-Computer Interaction and Design) at Politecnico di Milano for the Advanced User Interfaces course by Stefano Formicola (@ste7en), Fabiana Ferrara (@fabif11), Elena Palombini (@elenapalombini) and Marta Mazzi (@MartaMazzi).
 
