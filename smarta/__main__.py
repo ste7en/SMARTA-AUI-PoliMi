@@ -1,6 +1,11 @@
-from flask import Flask, request
-from smarta.smarta_fsm import Smarta
+from flask import Flask, request, render_template, redirect, url_for, abort, send_from_directory
+from markupsafe import escape
+from pygtail import Pygtail
+from smarta import Smarta
+from smarta import Event
+from time import sleep
 import logging
+import json
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -11,39 +16,107 @@ application_instance = Smarta()
 logging.debug('Flask WebInterface started')
 
 
+@app.route('/images/<path:path>')
+def send_images(path):
+    return send_from_directory('./templates/images', path)
+
+
+@app.route('/js/<path:path>')
+def send_js(path):
+    return send_from_directory('./templates/js', path)
+
+
 def start():
     logging.info('HTTP Client started the application')
-    application_instance.start()
+    if not application_instance.is_running(): application_instance.start()
 
 
 def stop():
     logging.info('HTTP Client stopped the application')
-    application_instance.stop()
+    if application_instance.is_running(): application_instance.stop()
 
 
+@app.route('/about')
+@app.route('/index')
 @app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def index():
+    return render_template('main.html')
 
 
-@app.route('/api/', methods=['POST', 'GET'])
-def api():
+@app.route('/api/<path:subpath>', methods=['POST', 'GET'])
+def api(subpath=None):
+    command = escape(subpath)
 
-    return '''
-        <form action="/api/start" method="get">
-            <p><input type=submit value=Start>         
-        </form>
-        <form action="/api/stop" method="get">
-            <p><input type=submit value=Stop>         
-        </form>
-    '''
+    if request.method == 'POST':
+        if command == 'config/set_param':
+            minutes = int(request.form['duration_min'])
+            seconds = int(request.form['duration_sec'])
+            Smarta.set_turn_duration(minutes * 60 + seconds)
+            return '', 204
+        if command == 'run/send_overlap':
+            application_instance.on_event(Event.VOICE_OVERLAP_DET_EV)
+            return '', 204
+        if command == 'set-team-name':
+            application_instance.set_team_name(request.form['team_name'])
+            return '', 204
+        else:
+            logging.error('Invalid POST request: ' + str(request.url))
+
+    if request.method == 'GET':
+        if command == 'start':
+            start()
+            return redirect(url_for('start_page'))
+        if command == 'stop':
+            stop()
+            return redirect(url_for('summary_page'))
+        if command == 'archive':
+            return render_template('archive.html')
+        if command == 'log':
+            return log()
+        if command == 'about':
+            return redirect(url_for('index'))
+        if command == 'archived-teams':
+            return json.dumps(application_instance.get_archived_teams())
+        else:
+            logging.error('Invalid GET request: ' + str(request.url))
+
+    abort(404)
 
 
-@app.route('/api/<command>')
-def api_command(command):
-    if command == 'start':
-        start()
-        return 'Start'
-    if command == 'stop':
-        stop()
-        return 'Stop'
+@app.route('/api/team-history', methods=['POST'])
+def api_team_history():
+    team_name = request.form['team_name']
+    return json.dumps(application_instance.get_team_history(team_name))
+
+
+@app.route('/api/config')
+@app.route('/api/config/')
+def config_page():
+    turn_duration = Smarta.get_turn_duration()
+    minutes = int(turn_duration / 60)
+    seconds = turn_duration % 60
+    return render_template('SetParameters.html', default_mins=minutes, default_secs=seconds)
+
+
+@app.route('/api/run')
+def start_page():
+    return render_template('OverlapPage.html')
+
+
+@app.route('/api/summary')
+def summary_page():
+    avg_duration, n_turns, n_overlaps = application_instance.get_summary()
+    return render_template('endGame.html',
+                           a_d_m=round(avg_duration/60),
+                           a_d_s=round(avg_duration % 60),
+                           n_turns=n_turns, n_overlaps=n_overlaps)
+
+
+def log():
+    def generate():
+        while True:
+            for line in Pygtail('../logs/smarta.log'):
+                yield line
+            sleep(2)
+
+    return app.response_class(generate(), mimetype='text/plain')

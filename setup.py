@@ -8,7 +8,7 @@ setup(
     description='',
     url='',
     packages=['smarta'],
-    install_requires=['smbus', 'RPi.GPIO', 'rpi_ws281x', 'flask'],
+    install_requires=['smbus', 'RPi.GPIO', 'rpi_ws281x', 'flask', 'markupsafe', 'pygtail'],
     scripts=[],
     classifiers=[
         "Programming Language :: Python :: 3.7",

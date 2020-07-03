@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smarta Web Interface</title>
+</head>
+<style>
+  body { background-color: #2B3146;
+    background-image: url('/images/CloudShapeBackground_2.png'), url('/images/cazziarelli.png'), url('/images/CloudShapeBackground_1.png');
+    background-repeat: no-repeat, repeat, no-repeat;
+    background-attachment: fixed;
+    background-size: fixed;
+    background-position: right bottom, right bottom, right bottom; }
+
+    img.LogoSmarta{
+      position: relative;
+      top: 50px;
+      left: 80px;
+      width: 20%;
+    }
+    .containerText {
+      position: relative;
+      top: 80px;
+      left: 80px;
+      color: #EDEDEC;
+      font-family: Bodoni MT;
+      font-size: 120%;
+      line-height: 30px;
+      letter-spacing: 2px;
+    }
+    .column {
+      float: left;
+      width: 25%;
+      padding: 0px;
+    }
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+    .column1 {
+      float: left;
+      width: 50%;
+      padding: 0px;
+    }
+    .row1::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+    img.Ball {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+    }
+    .button{
+      padding: 10px;
+      background-color: #9C67AF;
+      border: none;
+      border-radius: 5px;
+      margin: 100px 200px;
+      margin-top: 50px;
+      color:  #EDEDEC;
+      text-align: center;
+      font-size: 130%;
+      letter-spacing: 1px;
+      font-family: Bodoni MT;
+      text-align: center;
+      box-shadow: 0px 1px 4px #1B2133;
+    }
+
+    #archive {
+      padding: 10px;
+      background-color: #181C2C;
+      border: none;
+      border-radius: 5px;
+      margin: 100px 200px;
+      margin-top: 50px;
+      color:  #EDEDEC;
+      text-align: center;
+      font-size: 130%;
+      letter-spacing: 1px;
+      font-family: Bodoni MT;
+      text-align: center;
+      box-shadow: 0px 1px 4px #1B2133;
+    }
+    .container {
+      position: relative;
+      width: 101%;
+      margin-top: 100px;
+
+      border: none;
+    }
+    .center-left {
+      position: absolute;
+      text-align: center;
+      color: #EDEDEC;
+      font-size: 300%;
+      letter-spacing: 4px;
+      top: 50%;
+      left: 80px;
+      transform: translate(0, -50%);
+    }
+    .Fabiana {
+      color: #9DBA90;
+      font-family: Bodoni MT;
+      font-size: 105%;
+      position: relative;
+      line-height: 25px;
+      letter-spacing: 1px;
+      top: 32px;
+    }
+    .Elena {
+      color: #FBCC83;
+      font-family: Bodoni MT;
+      font-size: 105%;
+      position: relative;
+      line-height: 25px;
+      letter-spacing: 1px;
+      top: 32px;
+    }
+    .Marta {
+      color: #9C67AF;
+      font-family: Bodoni MT;
+      font-size: 105%;
+      position: relative;
+      line-height: 25px;
+      letter-spacing: 1px;
+      top: 32px;
+    }
+    .Stefano {
+      color: #F15175;
+      font-family: Bodoni MT;
+      font-size: 105%;
+      position: relative;
+      line-height: 25px;
+      letter-spacing: 1px;
+      top: 32px;
+    }
+  </style>
+  <body>
+
+    <a href="/">
+      <img src="/images/LogoSmarta.png" class="LogoSmarta" alt="LogoSmarta">
+    </a>
+
+    <div class="row1">
+      <div class="column1">
+
+  <div class="containerText">
+    <p>
+
+      SMARTA is a <b>smart object </b> that, during a  <br>
+      constructive conversation, is passed around  <br>
+      between participants.
+      <br><br>
+      By lighting up in different colors, making sounds  <br>
+      and vibrating, SMARTA signals the users on how <br>
+      the conversation is going.
+      <br><br>
+      The ball can also detect whether somebody is <br>
+      interrupting the current speaker or if another <br>
+      participant is willing to talk next.
+      <br>
+    </p>
+
+
+    <form class="form" name="GoToConfigurationPage" action='/api/config/' method="get">
+      <input type="submit" class="button" id="startGame" value="Let's Go!"/>
+    </form>
+    <form class="form" name="GoToArchive" action='/api/archive' method="get">
+      <input type="submit" class="button" id="archive" value="Archive"/>
+    </form>
+  </div>
+</div>
+  <div class="column1">
+    <img src="/images/Ball.png" class="Ball" alt="">
+  </div>
+</div>
+
+    <div class="container">
+      <img src="/images/RectangleRed.png" class="RectangleRed" alt="" style="width:100%">
+      <div class="center-left">Our Team #8</div>
+    </div>
+
+    <div style="text-align:center;padding-top:80px">
+      <div class="row">
+        <div class="column">
+          <img src="/images/BabaFab.png" alt="Fabiana" style="width:20%">
+          <br>
+          <a class="Fabiana">Fabiana Ferrara</a><br><a class="Fabiana">10508565</a>
+        </div>
+        <div class="column">
+          <img src="/images/BabaElena.png" alt="Elena" style="width:20%">
+          <br>
+          <a class="Elena">Elena Palombini</a><br><a class="Elena">10750000</a>
+        </div>
+        <div class="column">
+          <img src="/images/BabaMarta.png" alt="Marta" style="width:20%">
+          <br>
+          <a class="Marta">Marta Mazzi</a><br><a class="Marta">10750913</a>
+        </div>
+        <div class="column">
+          <img src="/images/BabaSte.png" alt="Stefano" style="width:20%">
+          <br>
+          <a class="Stefano">Stefano Formicola</a><br><a class="Stefano">10520490</a>
+        </div>
+      </div>
+    </div>
+
+<br><br><br><br><br><br><br><br><br>
+
+  </body>
+  </html>

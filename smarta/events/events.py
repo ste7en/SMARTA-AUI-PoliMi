@@ -1,4 +1,6 @@
 from enum import Enum, unique
+
+
 @unique
 class Event(Enum):
     START_EV = "Start event registered"

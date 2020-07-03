@@ -1,4 +1,4 @@
-from smarta.utility.accellerometer_manager import AccelerometerManager as Accelerometer
+from smarta.utility import AccelerometerManager
 from math import sqrt
 from statistics import mean
 from threading import Thread
@@ -11,13 +11,13 @@ import logging
 class LaunchDetector(Thread):
     # TODO: - Log and document this class
     __queue_length = 5
-    __acquisition_period_in_seconds = 0.1
+    __acquisition_period_in_seconds = 0.25
 
     def __init__(self):
         super().__init__()
         self.__vsa_array = []
         self.__sched = sched.scheduler(time.time, time.sleep)
-        self.__accelerometer = Accelerometer.get_instance()
+        self.__accelerometer = AccelerometerManager.get_instance()
         self.__stopped = False
 
     def _compute_and_store_vsa(self, x, y, z) -> None:
@@ -35,7 +35,7 @@ class LaunchDetector(Thread):
 
     def start_detection(self) -> None:
         self._enter_scheduler()
-        self.__sched.run(blocking=False)  # TODO: - check for possible issues here (default=True)
+        self.__sched.run(blocking=True)
         logging.debug('LaunchDetector - OK.')
 
     def run(self):
@@ -59,7 +59,7 @@ class LaunchDetector(Thread):
         z = self.__accelerometer.get_accel_z()  # get_gyro_z()
         self._compute_and_store_vsa(x, y, z)
         if not self.__stopped:
-            time.sleep(0.05)
+            # time.sleep(0.05) changed by setting __acquisition_period_in_seconds from 0.2 to 0.25
             self._enter_scheduler()
 
     def _enter_scheduler(self) -> None:

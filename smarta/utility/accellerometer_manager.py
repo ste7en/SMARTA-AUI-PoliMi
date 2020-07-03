@@ -1,4 +1,4 @@
-from smarta.utility.GPIOManager import GPIOManager
+from smarta.utility import GPIOManager
 
 
 class AccelerometerManager(GPIOManager):
